@@ -16,6 +16,12 @@ const initialOrders: Order[] = [
                 Height: 3,
                 Quantity: 4,
             },
+            {
+                Length: 1,
+                Width: 2,
+                Height: 3,
+                Quantity: 4,
+            },
         ],
         totalWeight: 10,
     },
