@@ -55,6 +55,7 @@ export const processOrder = async (order: Order) => {
         JSON.stringify(consignmentData),
     );
     const consignment = consignmentAPIResponse.ConsignmentList[0];
+    console.log(consignmentAPIResponse);
     if (
         !(
             consignmentAPIResponse.ResponseCode === '300' &&
@@ -64,7 +65,15 @@ export const processOrder = async (order: Order) => {
         throw new Error('Failed to send consignment data');
     }
 
-    
+    // const consignmentRecord = await db.consignment.create({
+    //     data: {
+    //         order_number: order.orderNumber,
+    //         consignment_id: consignmentID,
+    //         consignment_number: consignment.Connote,
+    //     },
+    // });
+    // console.log(consignmentRecord);
+    return consignmentAPIResponse.LabelURL;
 };
 
 const getOrderId = async (orderNumber: string) => {

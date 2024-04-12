@@ -1,3 +1,4 @@
+'use client';
 import type { Order } from '@/types';
 import {
     Table,
@@ -9,9 +10,10 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { processOrder } from '@/actions/process';
+import Link from 'next/link';
 
 type Props = {
     orders: Order[];
@@ -31,15 +33,17 @@ export const OrderList = ({ orders }: Props) => {
 
 const Order = ({ key, order }: { key: string; order: Order }) => {
     const [pending, startTransition] = useTransition();
+    const [consignmentLink, setConsignmentLink] = useState<string | null>('');
 
     const handleProcessClick = (order: Order) => {
         if (pending) return;
         startTransition(() => {
             processOrder(order)
-                .then(() => {
+                .then((data) => {
                     toast.success(
                         `Order ${order.orderNumber} processed successfully`,
                     );
+                    setConsignmentLink(data);
                 })
                 .catch((error: Error) => {
                     toast.error(`Failed to process ${order.orderNumber}`, {
@@ -109,13 +113,18 @@ const Order = ({ key, order }: { key: string; order: Order }) => {
                     </TableRow>
                 </TableFooter>
             </Table>
-            <div className='flex justify-end p-2'>
+            <div className='flex items-end justify-end gap-4 p-2'>
+                {consignmentLink && (
+                    <Link href={consignmentLink}>
+                        <Button variant='link'>Download Consignment</Button>
+                    </Link>
+                )}
                 <Button
                     onClick={() => {
                         handleProcessClick(order);
                     }}
                 >
-                    Process
+                    {pending ? 'Processing...' : 'Process Order'}
                 </Button>
             </div>
         </div>
