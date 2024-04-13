@@ -32,7 +32,12 @@ export const OrderList = ({ orders }: Props) => {
     );
 };
 
-const Order = ({ key, order }: { key: string; order: Order }) => {
+type OrderProps = {
+    key: string;
+    order: Order;
+};
+
+const Order = ({ key, order }: OrderProps) => {
     const [pending, startTransition] = useTransition();
     const [consignmentLink, setConsignmentLink] = useState<string | null>('');
 
@@ -68,7 +73,7 @@ const Order = ({ key, order }: { key: string; order: Order }) => {
     return (
         <div
             key={key}
-            className='rounded-lg border-2 border-slate-200 bg-white shadow-lg'
+            className='flex flex-col justify-between rounded-lg border-2 border-slate-200 bg-white shadow-lg'
         >
             <div className='relative max-h-[180px] overflow-auto '>
                 <Table>
@@ -118,7 +123,7 @@ const Order = ({ key, order }: { key: string; order: Order }) => {
                     </TableFooter>
                 </Table>
             </div>
-            <div className='flex items-end justify-end gap-4 border-t p-2'>
+            <div className='flex justify-end gap-4 border-t p-2'>
                 {consignmentLink && (
                     <Link href={consignmentLink}>
                         <Button variant='link'>Download Consignment</Button>
