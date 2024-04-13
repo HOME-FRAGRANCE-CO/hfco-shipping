@@ -13,6 +13,17 @@ export type OrderRow = {
     Quantity: number;
 };
 
+export type ProcessedOrder = {
+    id: number;
+    order_number: string;
+    consignment_number: string;
+    consignment_id: number;
+    processed_date: Date | null;
+    label_url: string | null;
+};
+
+//API
+
 export interface OrderIDResponse {
     data: {
         orders: {

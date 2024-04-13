@@ -13,7 +13,7 @@ datasource db {
 model consignment {
     id                 Int       @id @unique @default(autoincrement())
     order_number       String    @unique
-    consignment_number String?
+    consignment_number String
     consignment_id     Int       @unique @default(autoincrement())
     processed_date     DateTime? @default(now())
     label_url          String?

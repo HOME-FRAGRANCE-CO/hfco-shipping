@@ -1,12 +1,17 @@
-import { deleteConsignment } from '@/actions/history';
+import { getProcessedOrders } from '@/prisma/queries';
 import { ProcessedOrder } from './ProcessedOrder';
 
-const ProcessedPage = () => {
+const ProcessedOrdersPage = async () => {
+    const processedOrdersData = getProcessedOrders();
+    const [processedOrders] = await Promise.all([processedOrdersData]);
+
     return (
         <div>
-            <ProcessedOrder />
+            {processedOrders.map((order) => (
+                <ProcessedOrder key={order.id} processedOrder={order} />
+            ))}
         </div>
     );
 };
 
-export default ProcessedPage;
+export default ProcessedOrdersPage;

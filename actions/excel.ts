@@ -72,8 +72,8 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
                     });
                     resolve(orders);
                 })
-                .catch((error) => {
-                    reject(error);
+                .catch((error: Error) => {
+                    toast.error(error.message);
                 });
         };
 

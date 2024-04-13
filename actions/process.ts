@@ -7,7 +7,6 @@ import type {
     OrderIDResponse,
     OrderRow,
 } from '@/types';
-import { error } from 'console';
 
 const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
@@ -25,9 +24,6 @@ export const processOrder = async (order: Order) => {
     const alreadyProcessed = await db.consignment.findFirst({
         where: {
             order_number: order.orderNumber,
-            consignment_number: {
-                not: null,
-            },
         },
     });
     if (alreadyProcessed) {

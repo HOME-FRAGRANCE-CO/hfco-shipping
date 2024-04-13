@@ -34,6 +34,7 @@ export default function RootLayout({
                         position='top-center'
                         theme='light'
                         closeButton
+                        duration={3000}
                     />
                 </body>
             </html>
