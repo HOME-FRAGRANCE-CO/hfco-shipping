@@ -7,12 +7,11 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
             <Header />
             <div className='flex flex-1 flex-col items-center justify-center'>
                 <main className='h-full'>
-                    <div className='mx-auto h-full max-w-[1056px] pt-6'>
+                    <div className='mx-auto h-full max-w-[1400px] pt-6'>
                         {children}
                     </div>
                 </main>
             </div>
-
             <Footer />
         </div>
     );
