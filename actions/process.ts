@@ -70,6 +70,7 @@ export const processOrder = async (order: Order) => {
     //         order_number: order.orderNumber,
     //         consignment_id: consignmentID,
     //         consignment_number: consignment.Connote,
+    //         label_url: consignmentAPIResponse.LabelURL,
     //     },
     // });
     // console.log(consignmentRecord);

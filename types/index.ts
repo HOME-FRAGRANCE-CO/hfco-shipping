@@ -62,23 +62,6 @@ interface Extensions {
     };
 }
 
-// {
-//     ResponseCode: '300',
-//     ResponseMessage: 'OK',
-//     LabelURL:
-//       'https://www.directfreight.com.au/dispatch/ViewConnoteLabelsAPI.aspx?id=B5A66B55-73FB-4CD1-B6BB-9BDFCAD618F7',
-//     ConsignmentList: [
-//       {
-//         ResponseCode: '200',
-//         ResponseMessage: 'Record created successfully.',
-//         ConsignmentId: 1701549180,
-//         Connote: '2424382038481',
-//         ConnoteDate: '2024-04-12T00:00:00',
-//         SortCode: '4B242 B101'
-//       }
-//     ]
-//   }
-
 export interface DirectFreightResponse {
     ResponseCode: string;
     ResponseMessage: string;
@@ -93,4 +76,16 @@ export interface Consignment {
     Connote: string;
     ConnoteDate: string;
     SortCode: string;
+}
+
+export interface cancelConsignmentResponse {
+    ResponseCode: string;
+    ResponseMessage: string;
+    ConnoteList: Connote[];
+}
+
+export interface Connote {
+    Connote: string;
+    ResponseCode: string;
+    ResponseMessage: string;
 }
