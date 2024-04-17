@@ -29,7 +29,6 @@ export const deleteConsignment = async (consignmentNumber: string) => {
   });
 
   const data = (await response.json()) as cancelConsignmentResponse;
-  console.log(data);
   if (
     !(
       data.ResponseCode === '300' &&
