@@ -40,7 +40,7 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
 
             if (orderNumber !== null) {
               // Extracting order number without the first 2 characters
-              const extractedOrderNumber = orderNumber.substring(2);
+              const extractedOrderNumber = orderNumber.trim().substring(2);
 
               // If a new order number is encountered, create a new order object
               if (extractedOrderNumber !== currentOrderNumber) {
