@@ -1,11 +1,11 @@
 'use server';
 import { db } from '@/prisma/db';
 import type {
-    DirectFreightResponse,
-    Order,
-    OrderDetailsResponse,
-    OrderIDResponse,
-    OrderRow,
+  DirectFreightResponse,
+  Order,
+  OrderDetailsResponse,
+  OrderIDResponse,
+  OrderRow,
 } from '@/types';
 
 const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
@@ -16,66 +16,71 @@ const DF_auth = process.env.DF_AUTHORISATION;
 const DF_accNum = process.env.DF_ACCOUNT_NUMBER;
 const DF_senderSiteId = process.env.DF_SENDER_SITE_ID;
 
-export const processOrder = async (order: Order) => {
-    const orderID = await getOrderId(order.orderNumber);
-    if (!orderID) {
-        throw new Error('Order not found');
-    }
-    const alreadyProcessed = await db.consignment.findFirst({
-        where: {
-            order_number: order.orderNumber,
-        },
-    });
-    if (alreadyProcessed) {
-        throw new Error('Order already processed');
-    }
+export const processOrder = async (
+  order: Order & {
+    deliveryNotes: string;
+    authorityToLeave: boolean;
+  },
+) => {
+  const orderID = await getOrderId(order.orderNumber);
+  if (!orderID) {
+    throw new Error('Order not found');
+  }
+  const alreadyProcessed = await db.consignment.findFirst({
+    where: {
+      order_number: order.orderNumber,
+    },
+  });
+  if (alreadyProcessed) {
+    throw new Error('Order already processed');
+  }
 
-    const orderDetails = await getOrderDetails(orderID);
-    if (!orderDetails) {
-        throw new Error('Failed to get order details');
-    }
-    const consignmentID = await getConsignmentIDNumber();
-    if (!consignmentID) {
-        throw new Error('Failed to generate consignment ID');
-    }
+  const orderDetails = await getOrderDetails(orderID);
+  if (!orderDetails) {
+    throw new Error('Failed to get order details');
+  }
+  const consignmentID = await getConsignmentIDNumber();
+  if (!consignmentID) {
+    throw new Error('Failed to generate consignment ID');
+  }
 
-    const consignmentData = createConsignmentData(
-        order,
-        orderDetails,
-        consignmentID,
-    );
-    if (!consignmentData) {
-        throw new Error('Failed to create consignment data');
-    }
-    const consignmentAPIResponse = await sendConsignmentData(
-        JSON.stringify(consignmentData),
-    );
-    const consignment = consignmentAPIResponse.ConsignmentList[0];
-    console.log(consignmentAPIResponse);
-    if (
-        !(
-            consignmentAPIResponse.ResponseCode === '300' &&
-            consignment.ResponseCode === '200'
-        )
-    ) {
-        throw new Error('Failed to send consignment data');
-    }
+  const consignmentData = createConsignmentData(
+    order,
+    orderDetails,
+    consignmentID,
+  );
+  if (!consignmentData) {
+    throw new Error('Failed to create consignment data');
+  }
+  const consignmentAPIResponse = await sendConsignmentData(
+    JSON.stringify(consignmentData),
+  );
+  const consignment = consignmentAPIResponse.ConsignmentList[0];
+  console.log(consignmentAPIResponse);
+  if (
+    !(
+      consignmentAPIResponse.ResponseCode === '300' &&
+      consignment.ResponseCode === '200'
+    )
+  ) {
+    throw new Error('Failed to send consignment data');
+  }
 
-    const consignmentRecord = await db.consignment.create({
-        data: {
-            order_number: order.orderNumber,
-            consignment_id: consignmentID,
-            consignment_number: consignment.Connote,
-            label_url: consignmentAPIResponse.LabelURL,
-        },
-    });
-    console.log(consignmentRecord);
-    return consignmentAPIResponse.LabelURL;
+  const consignmentRecord = await db.consignment.create({
+    data: {
+      order_number: order.orderNumber,
+      consignment_id: consignmentID,
+      consignment_number: consignment.Connote,
+      label_url: consignmentAPIResponse.LabelURL,
+    },
+  });
+  console.log(consignmentRecord);
+  return consignmentAPIResponse.LabelURL;
 };
 
 const getOrderId = async (orderNumber: string) => {
-    const queryBody = {
-        query: `
+  const queryBody = {
+    query: `
       {
         orders(first: 1, query: "name:${orderNumber}") {
           edges {
@@ -86,22 +91,22 @@ const getOrderId = async (orderNumber: string) => {
         }
       }
     `,
-    };
+  };
 
-    const response = await shopifyQueryAPI(queryBody);
+  const response = await shopifyQueryAPI(queryBody);
 
-    const data = (await response.json()) as OrderIDResponse;
-    if (!data.data.orders.edges[0]) {
-        return;
-    }
-    const orderID = data.data.orders.edges[0].node.id;
+  const data = (await response.json()) as OrderIDResponse;
+  if (!data.data.orders.edges[0]) {
+    return;
+  }
+  const orderID = data.data.orders.edges[0].node.id;
 
-    return orderID;
+  return orderID;
 };
 
 async function getOrderDetails(orderID: string) {
-    const orderIDQuery = {
-        query: `
+  const orderIDQuery = {
+    query: `
       {
         order(id: "${orderID}") {
           name
@@ -123,157 +128,157 @@ async function getOrderDetails(orderID: string) {
         }
       }
     `,
-    };
+  };
 
-    const response = await shopifyQueryAPI(orderIDQuery);
+  const response = await shopifyQueryAPI(orderIDQuery);
 
-    const data = (await response.json()) as OrderDetailsResponse;
+  const data = (await response.json()) as OrderDetailsResponse;
 
-    return {
-        custRef: data.data.order.name,
-        companyName: data.data.order.shippingAddress.company,
-        custName: data.data.order.billingAddress.lastName,
-        addressOne: data.data.order.shippingAddress.address1,
-        addressTwo: data.data.order.shippingAddress.address2 ?? '',
-        suburb: data.data.order.shippingAddress.city,
-        postcode: data.data.order.shippingAddress.zip,
-        province: data.data.order.shippingAddress.provinceCode,
-        phone: data.data.order.shippingAddress.phone || '',
-        email: data.data.order.email,
-    };
+  return {
+    custRef: data.data.order.name,
+    companyName: data.data.order.shippingAddress.company,
+    custName: data.data.order.billingAddress.lastName,
+    addressOne: data.data.order.shippingAddress.address1,
+    addressTwo: data.data.order.shippingAddress.address2 ?? '',
+    suburb: data.data.order.shippingAddress.city,
+    postcode: data.data.order.shippingAddress.zip,
+    province: data.data.order.shippingAddress.provinceCode,
+    phone: data.data.order.shippingAddress.phone || '',
+    email: data.data.order.email,
+  };
 }
 
 const shopifyQueryAPI = async (queryBody: { query: string }) => {
-    const response = await fetch(storeDomain!, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Shopify-Access-Token': accessToken ?? '',
-        },
-        body: JSON.stringify(queryBody),
-    });
+  const response = await fetch(storeDomain!, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Access-Token': accessToken ?? '',
+    },
+    body: JSON.stringify(queryBody),
+  });
 
-    return response;
+  return response;
 };
 
 const getConsignmentIDNumber = async () => {
-    try {
-        let attempts = 0;
-        const maxAttempts = 10;
+  try {
+    let attempts = 0;
+    const maxAttempts = 10;
 
-        while (attempts < maxAttempts) {
-            const consignmentIdCandidate =
-                Math.floor(Math.random() * (2147483647 - 130 + 1)) + 130;
+    while (attempts < maxAttempts) {
+      const consignmentIdCandidate =
+        Math.floor(Math.random() * (2147483647 - 130 + 1)) + 130;
 
-            // Check if the generated ConsignmentId is unique
-            const isUnique = await isConsignmentIDUnique(
-                consignmentIdCandidate,
-            );
+      // Check if the generated ConsignmentId is unique
+      const isUnique = await isConsignmentIDUnique(consignmentIdCandidate);
 
-            if (isUnique) {
-                // If unique, return the ConsignmentId
-                return consignmentIdCandidate;
-            }
-            // If not unique, try again
-            attempts++;
-        }
-        return;
-    } catch (error) {
-        return;
-    } finally {
-        await db.$disconnect();
+      if (isUnique) {
+        // If unique, return the ConsignmentId
+        return consignmentIdCandidate;
+      }
+      // If not unique, try again
+      attempts++;
     }
+    return;
+  } catch (error) {
+    return;
+  } finally {
+    await db.$disconnect();
+  }
 };
 
 const isConsignmentIDUnique = async (consignmentId: number) => {
-    const existingConsignment = await db.consignment.findFirst({
-        where: {
-            consignment_id: consignmentId,
-        },
-    });
+  const existingConsignment = await db.consignment.findFirst({
+    where: {
+      consignment_id: consignmentId,
+    },
+  });
 
-    return !existingConsignment;
+  return !existingConsignment;
 };
 
 const createConsignmentData = (
-    order: Order,
-    orderDetails: {
-        custRef: string;
-        companyName: string;
-        custName: string;
-        addressOne: string;
-        addressTwo: string;
-        suburb: string;
-        postcode: string;
-        province: string;
-        phone: string;
-        email: string;
-    },
-    consignmentID: number,
+  order: Order & {
+    deliveryNotes: string;
+    authorityToLeave: boolean;
+  },
+  orderDetails: {
+    custRef: string;
+    companyName: string;
+    custName: string;
+    addressOne: string;
+    addressTwo: string;
+    suburb: string;
+    postcode: string;
+    province: string;
+    phone: string;
+    email: string;
+  },
+  consignmentID: number,
 ) => {
-    const consignmentData = {
-        ConsignmentList: [
-            {
-                ConsignmentId: consignmentID,
-                ConnoteDate: '',
-                CustomerReference: orderDetails.custRef,
-                IsConsolidate: true,
-                ReceiverDetails: {
-                    ReceiverName: orderDetails.companyName,
-                    AddressLine1: orderDetails.addressOne,
-                    AddressLine2: orderDetails.addressTwo,
-                    Suburb: orderDetails.suburb,
-                    Postcode: orderDetails.postcode,
-                    State: orderDetails.province,
-                    // DeliveryInstructions: orderNotes || '',
-                    ReceiverContactName:
-                        orderDetails.custName || orderDetails.companyName,
-                    ReceiverContactMobile: orderDetails.phone,
-                    ReceiverContactEmail: orderDetails.email,
-                },
+  const consignmentData = {
+    ConsignmentList: [
+      {
+        ConsignmentId: consignmentID,
+        ConnoteDate: '',
+        CustomerReference: orderDetails.custRef,
+        IsConsolidate: true,
+        ReceiverDetails: {
+          ReceiverName: orderDetails.companyName,
+          AddressLine1: orderDetails.addressOne,
+          AddressLine2: orderDetails.addressTwo,
+          Suburb: orderDetails.suburb,
+          Postcode: orderDetails.postcode,
+          State: orderDetails.province,
+          DeliveryInstructions: order.deliveryNotes,
+          isAuthorityToLeave: order.authorityToLeave,
+          ReceiverContactName:
+            orderDetails.custName || orderDetails.companyName,
+          ReceiverContactMobile: orderDetails.phone,
+          ReceiverContactEmail: orderDetails.email,
+        },
 
-                ConsignmentLineItems: order.orderRows.map((row) => ({
-                    PackageDescription: order['Carton/Pallet'].toUpperCase(),
-                    Items: row.Quantity,
-                    Kgs: calculateLineKgs(order, row),
-                    Length: row.Length,
-                    Width: row.Width,
-                    Height: row.Height,
-                    Cubic: (
-                        (row.Length * row.Width * row.Height) /
-                        1000000
-                    ).toFixed(3),
-                })),
-            },
-        ],
-    };
-    return consignmentData;
+        ConsignmentLineItems: order.orderRows.map((row) => ({
+          PackageDescription: order['Carton/Pallet'].toUpperCase(),
+          Items: row.Quantity,
+          Kgs: calculateLineKgs(order, row),
+          Length: row.Length,
+          Width: row.Width,
+          Height: row.Height,
+          Cubic: ((row.Length * row.Width * row.Height) / 1000000).toFixed(3),
+        })),
+      },
+    ],
+  };
+
+  return consignmentData;
 };
 
 const calculateLineKgs = (order: Order, row: OrderRow) => {
-    const totalQuantity = order.orderRows.reduce(
-        (acc, row) => acc + row.Quantity,
-        0,
-    );
+  const totalQuantity = order.orderRows.reduce(
+    (acc, row) => acc + row.Quantity,
+    0,
+  );
 
-    return (row.Quantity / totalQuantity) * order.totalWeight;
+  return (row.Quantity / totalQuantity) * order.totalWeight;
 };
 
 const sendConsignmentData = async (consignmentBody: string) => {
-    const response = await fetch(DF_apiUrl!, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorisation: DF_auth!,
-            AccountNumber: DF_accNum!,
-            SiteId: DF_senderSiteId!,
-        },
-        body: consignmentBody,
-    });
+  const response = await fetch(DF_apiUrl!, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorisation: DF_auth!,
+      AccountNumber: DF_accNum!,
+      SiteId: DF_senderSiteId!,
+    },
+    body: consignmentBody,
+  });
 
-    const data = (await response.json()) as DirectFreightResponse;
-    console.log(data);
+  const data = (await response.json()) as DirectFreightResponse;
+  console.log(data);
 
-    return data;
+  return data;
 };

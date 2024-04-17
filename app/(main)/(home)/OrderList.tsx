@@ -15,6 +15,9 @@ import { toast } from 'sonner';
 import { processOrder } from '@/actions/process';
 import Link from 'next/link';
 import { Loader } from '@/components/ui/loader';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@radix-ui/react-label';
+import { Checkbox } from '@/components/ui/checkbox';
 
 type Props = {
   orders: Order[];
@@ -39,9 +42,16 @@ type OrderProps = {
 
 const Order = ({ key, order }: OrderProps) => {
   const [pending, startTransition] = useTransition();
+  const [deliveryNotes, setDeliveryNotes] = useState<string>('');
   const [consignmentLink, setConsignmentLink] = useState<string | null>('');
+  const [authorityToLeave, setAuthorityToLeave] = useState<boolean>(false);
 
-  const handleProcessClick = (order: Order) => {
+  const handleProcessClick = (
+    order: Order & {
+      deliveryNotes: string;
+      authorityToLeave: boolean;
+    },
+  ) => {
     if (pending) return;
     startTransition(() => {
       processOrder(order)
@@ -111,20 +121,46 @@ const Order = ({ key, order }: OrderProps) => {
           </TableFooter>
         </Table>
       </div>
-      <div className='flex justify-end gap-4 border-t p-2'>
-        {consignmentLink && (
-          <Link href={consignmentLink}>
-            <Button variant='link'>Download Consignment</Button>
-          </Link>
-        )}
-        <Button
-          disabled={pending}
-          onClick={() => {
-            handleProcessClick(order);
-          }}
-        >
-          {pending ? <Loader /> : 'Process Order'}
-        </Button>
+
+      <div className='p-2'>
+        <Textarea
+          className='resize-none'
+          placeholder='Delivery Notes'
+          maxLength={255}
+          onChange={(e) => setDeliveryNotes(e.target.value)}
+        />
+      </div>
+      <div className='flex justify-between border-t'>
+        <div className='flex items-center justify-center gap-2 px-4 py-2'>
+          <Checkbox
+            onCheckedChange={() => {
+              setAuthorityToLeave((prevIsChecked) => !prevIsChecked);
+            }}
+            checked={authorityToLeave}
+          />
+          <Label className='text-sm text-neutral-400'>
+            Authority to Leave?
+          </Label>
+        </div>
+        <div className='flex justify-end gap-4 p-2'>
+          {consignmentLink && (
+            <Link href={consignmentLink}>
+              <Button variant='link'>Download Consignment</Button>
+            </Link>
+          )}
+          <Button
+            disabled={pending}
+            onClick={() => {
+              handleProcessClick({
+                ...order,
+                deliveryNotes,
+                authorityToLeave,
+              });
+            }}
+          >
+            {pending ? <Loader /> : 'Process Order'}
+          </Button>
+        </div>
       </div>
     </div>
   );
