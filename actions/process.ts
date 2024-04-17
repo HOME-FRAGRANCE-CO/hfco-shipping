@@ -5,6 +5,7 @@ import type {
   Order,
   OrderDetailsResponse,
   OrderIDResponse,
+  OrderNotesResponse,
   OrderRow,
 } from '@/types';
 
@@ -281,4 +282,47 @@ const sendConsignmentData = async (consignmentBody: string) => {
   console.log(data);
 
   return data;
+};
+
+//Order Notes
+export const getOrderNotes = async (orderNumber: string) => {
+  const orderID = await getOrderId(orderNumber);
+  if (!orderID) {
+    throw new Error('Order not found');
+  }
+  const orderNotesQuery = {
+    query: `{
+    order(id: "${orderID}") {
+      name
+      customer {
+        note
+        companyContactProfiles {
+          company {
+            name
+            note
+          }
+        }
+      }
+      purchasingEntity {
+        ... on PurchasingCompany {
+          __typename
+          location {
+            name
+            note
+          }
+        }
+      }
+    }
+  }`,
+  };
+
+  const response = await shopifyQueryAPI(orderNotesQuery);
+
+  const data = (await response.json()) as OrderNotesResponse;
+  return {
+    customerNotes: data.data.order.customer.note,
+    companyNotes:
+      data.data.order.customer.companyContactProfiles[0].company.note,
+    locationNotes: data.data.order.purchasingEntity.location.note,
+  };
 };

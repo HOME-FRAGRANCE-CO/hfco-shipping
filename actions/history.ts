@@ -10,7 +10,6 @@ const DF_accNum = process.env.DF_ACCOUNT_NUMBER;
 const DF_senderSiteId = process.env.DF_SENDER_SITE_ID;
 
 export const deleteConsignment = async (consignmentNumber: string) => {
-  console.log('Deleting Consignment', consignmentNumber);
   const response = await fetch(DF_apiUrl, {
     method: 'POST',
     headers: {
