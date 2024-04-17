@@ -190,6 +190,18 @@ const Order = ({ key, order }: OrderProps) => {
               ) : (
                 <div className='space-y-2'>
                   <div>
+                    <h4 className='text-sm font-bold'>Order Notes</h4>
+                    <p className='text-xs'>
+                      {!orderNotes.orderNotes ? (
+                        <span className='italic text-slate-400'>
+                          No order notes
+                        </span>
+                      ) : (
+                        orderNotes.orderNotes
+                      )}
+                    </p>
+                  </div>
+                  <div>
                     <h4 className='text-sm font-bold'>Customer Notes</h4>
                     <p className='text-xs'>
                       {!orderNotes.customerNotes ? (

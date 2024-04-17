@@ -23,6 +23,7 @@ export type ProcessedOrder = {
 };
 
 export type OrderNotes = {
+  orderNotes: string | null;
   customerNotes: string | null;
   companyNotes: string | null;
   locationNotes: string | null;
@@ -71,6 +72,7 @@ export interface OrderNotesResponse {
   data: {
     order: {
       name: string;
+      note: string | null;
       customer: {
         note: string | null;
         companyContactProfiles: {

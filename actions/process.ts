@@ -296,6 +296,7 @@ export const getOrderNotes = async (orderNumber: string) => {
     query: `{
     order(id: "${orderID}") {
       name
+      note
       customer {
         note
         companyContactProfiles {
@@ -321,7 +322,9 @@ export const getOrderNotes = async (orderNumber: string) => {
   const response = await shopifyQueryAPI(orderNotesQuery);
 
   const data = (await response.json()) as OrderNotesResponse;
+  console.log(data);
   return {
+    orderNotes: data.data.order.note,
     customerNotes: data.data.order.customer.note,
     companyNotes:
       data.data.order.customer.companyContactProfiles[0].company.note,
