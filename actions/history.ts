@@ -29,7 +29,6 @@ export const deleteConsignment = async (consignmentNumber: string) => {
     });
 
     const data = (await response.json()) as cancelConsignmentResponse;
-    console.log(data);
     if (
         !(
             data.ResponseCode === '300' &&
@@ -39,9 +38,9 @@ export const deleteConsignment = async (consignmentNumber: string) => {
         throw new Error(data.ConnoteList[0].ResponseMessage);
     }
 
-    // await db.consignment.deleteMany({
-    //     where: {
-    //         consignment_number: consignmentNumber,
-    //     },
-    // });
+    await db.consignment.deleteMany({
+        where: {
+            consignment_number: consignmentNumber,
+        },
+    });
 };

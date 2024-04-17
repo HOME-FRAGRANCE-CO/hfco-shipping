@@ -49,7 +49,7 @@ export const Navbar = () => {
                     )}
                 />
             </Link>
-            <Link
+            {/* <Link
                 href='/tradefair'
                 className={cn(
                     'group relative text-lg text-neutral-700 hover:text-slate-400',
@@ -69,7 +69,7 @@ export const Navbar = () => {
                         },
                     )}
                 />
-            </Link>
+            </Link> */}
         </nav>
     );
 };

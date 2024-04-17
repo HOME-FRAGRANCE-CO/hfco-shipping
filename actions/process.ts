@@ -61,15 +61,15 @@ export const processOrder = async (order: Order) => {
         throw new Error('Failed to send consignment data');
     }
 
-    // const consignmentRecord = await db.consignment.create({
-    //     data: {
-    //         order_number: order.orderNumber,
-    //         consignment_id: consignmentID,
-    //         consignment_number: consignment.Connote,
-    //         label_url: consignmentAPIResponse.LabelURL,
-    //     },
-    // });
-    // console.log(consignmentRecord);
+    const consignmentRecord = await db.consignment.create({
+        data: {
+            order_number: order.orderNumber,
+            consignment_id: consignmentID,
+            consignment_number: consignment.Connote,
+            label_url: consignmentAPIResponse.LabelURL,
+        },
+    });
+    console.log(consignmentRecord);
     return consignmentAPIResponse.LabelURL;
 };
 
