@@ -29,11 +29,22 @@ export const deleteConsignment = async (consignmentNumber: string) => {
   });
 
   const data = (await response.json()) as cancelConsignmentResponse;
+  console.log(data);
   if (
-    !(data.ResponseCode === '300' && data.ConnoteList[0].ResponseCode === '200')
+    !(
+      data.ResponseCode === '300' &&
+      (data.ConnoteList[0].ResponseCode === '200' ||
+        data.ConnoteList[0].ResponseCode === '421')
+    )
   ) {
-    throw new Error(data.ConnoteList[0].ResponseMessage);
+    throw new Error('Failed to cancel consignment');
   }
+
+  if (data.ConnoteList[0].ResponseCode === '421')
+    return {
+      error:
+        'Cannot cancel connote. We are unable to process your request, the consignment has been either pickup confirmed /collected, despatched or finalised.',
+    };
 
   await db.consignment.deleteMany({
     where: {

@@ -31,6 +31,7 @@ const ProcessedOrdersPage = async () => {
               <TableCell>{order.processed_date?.toDateString()}</TableCell>
               <TableCell>
                 <ProcessedOrderMenu
+                  orderNumber={order.order_number}
                   consignmentNumber={order.consignment_number}
                   labelUrl={order.label_url}
                 />

@@ -62,12 +62,30 @@ const Order = ({ key, order }: OrderProps) => {
     startTransition(() => {
       processOrder(order)
         .then((data) => {
+          if (data.error) {
+            toast.error(`Failed to process Order ${order.orderNumber}`, {
+              description: data.error,
+              action: {
+                label: 'Retry',
+                onClick: () => {
+                  handleProcessClick(order);
+                },
+              },
+              actionButtonStyle: {
+                backgroundColor: 'red',
+                color: 'white',
+                fontWeight: 'bold',
+              },
+            });
+            return;
+          }
           toast.success(`Order ${order.orderNumber} processed successfully`);
-          setConsignmentLink(data);
+          setConsignmentLink(data.success ?? null);
         })
-        .catch((error: Error) => {
-          toast.error(`Failed to process ${order.orderNumber}`, {
-            description: error.message,
+        .catch(() => {
+          toast.error(`Failed to process Order ${order.orderNumber}`, {
+            description:
+              'An error occurred while processing the order. Please try again later.',
             action: {
               label: 'Retry',
               onClick: () => {
@@ -90,9 +108,9 @@ const Order = ({ key, order }: OrderProps) => {
       .then((notes) => {
         setOrderNotes(notes);
       })
-      .catch((error: Error) => {
+      .catch(() => {
         toast.error('Failed to get order notes', {
-          description: error.message,
+          description: 'Please try again later.',
         });
       });
   };

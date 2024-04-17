@@ -19,22 +19,35 @@ import {
 import Link from 'next/link';
 
 type Props = {
+  orderNumber: string;
   consignmentNumber: string;
   labelUrl: string | null;
 };
-export const ProcessedOrderMenu = ({ consignmentNumber, labelUrl }: Props) => {
+export const ProcessedOrderMenu = ({
+  orderNumber,
+  consignmentNumber,
+  labelUrl,
+}: Props) => {
   const [pending, startTransition] = useTransition();
 
   const handleDeleteClick = async () => {
     if (pending) return;
     startTransition(async () => {
       deleteConsignment(consignmentNumber)
-        .then(() => {
-          toast.success('Consignment deleted');
+        .then((data) => {
+          console.log(data);
+          if (data?.error) {
+            toast.error(`Failed to cancel Order ${orderNumber}`, {
+              description: data.error,
+            });
+            return;
+          }
+          toast.success(`Order ${orderNumber} deleted successfully`);
         })
-        .catch((error: Error) => {
-          toast.error('Failed to delete consignment', {
-            description: error.message,
+        .catch(() => {
+          toast.error(`Failed to cancel Order ${orderNumber}`, {
+            description:
+              'An unknown error has occurred. Please try again later',
           });
         });
     });

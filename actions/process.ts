@@ -25,7 +25,7 @@ export const processOrder = async (
 ) => {
   const orderID = await getOrderId(order.orderNumber);
   if (!orderID) {
-    throw new Error('Order not found');
+    return { error: 'Order not found' };
   }
   const alreadyProcessed = await db.consignment.findFirst({
     where: {
@@ -33,16 +33,16 @@ export const processOrder = async (
     },
   });
   if (alreadyProcessed) {
-    throw new Error('Order already processed');
+    return { error: 'Order already processed' };
   }
 
   const orderDetails = await getOrderDetails(orderID);
   if (!orderDetails) {
-    throw new Error('Failed to get order details');
+    return { error: 'Failed to get order details' };
   }
   const consignmentID = await getConsignmentIDNumber();
   if (!consignmentID) {
-    throw new Error('Failed to generate consignment ID');
+    return { error: 'Failed to get consignment ID' };
   }
 
   const consignmentData = createConsignmentData(
@@ -51,7 +51,7 @@ export const processOrder = async (
     consignmentID,
   );
   if (!consignmentData) {
-    throw new Error('Failed to create consignment data');
+    return { error: 'Failed to create consignment data' };
   }
   const consignmentAPIResponse = await sendConsignmentData(
     JSON.stringify(consignmentData),
@@ -64,7 +64,7 @@ export const processOrder = async (
       consignment.ResponseCode === '200'
     )
   ) {
-    throw new Error('Failed to send consignment data');
+    return { error: 'Failed to create consignment' };
   }
 
   const consignmentRecord = await db.consignment.create({
@@ -76,7 +76,7 @@ export const processOrder = async (
     },
   });
   console.log(consignmentRecord);
-  return consignmentAPIResponse.LabelURL;
+  return { success: consignmentAPIResponse.LabelURL };
 };
 
 const getOrderId = async (orderNumber: string) => {
