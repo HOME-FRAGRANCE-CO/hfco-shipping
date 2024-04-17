@@ -164,7 +164,7 @@ const Order = ({ key, order }: OrderProps) => {
                 View Order Notes
               </Button>
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent align='start' side='top'>
               {!orderNotes ? (
                 <div className='flex items-center justify-center'>
                   <Loader />

@@ -4,96 +4,30 @@ import type { Order } from '@/types';
 import { useState } from 'react';
 import { OrderList } from './OrderList';
 
-const initialOrders: Order[] = [
-  {
-    orderNumber: '#W1101',
-    'Carton/Pallet': 'Carton',
-    EPAC: 'EPAC21232321321',
-    orderRows: [
-      {
-        Length: 1,
-        Width: 2,
-        Height: 3,
-        Quantity: 4,
-      },
-      {
-        Length: 1,
-        Width: 2,
-        Height: 3,
-        Quantity: 4,
-      },
-    ],
-    totalWeight: 10,
-  },
-  {
-    orderNumber: '#W33333',
-    'Carton/Pallet': 'Pallet',
-    EPAC: 'EPAC3213213214',
-    orderRows: [
-      {
-        Length: 4,
-        Width: 3,
-        Height: 2,
-        Quantity: 1,
-      },
-    ],
-    totalWeight: 20,
-  },
-  {
-    orderNumber: '#W2376',
-    'Carton/Pallet': 'Carton',
-    EPAC: 'EPAC23123123',
-    orderRows: [
-      {
-        Length: 5,
-        Width: 6,
-        Height: 7,
-        Quantity: 8,
-      },
-      {
-        Length: 9,
-        Width: 10,
-        Height: 11,
-        Quantity: 12,
-      },
-      {
-        Length: 13,
-        Width: 14,
-        Height: 15,
-        Quantity: 16,
-      },
-      {
-        Length: 5,
-        Width: 6,
-        Height: 7,
-        Quantity: 8,
-      },
-      {
-        Length: 9,
-        Width: 10,
-        Height: 11,
-        Quantity: 12,
-      },
-      {
-        Length: 13,
-        Width: 14,
-        Height: 15,
-        Quantity: 16,
-      },
-    ],
-    totalWeight: 30,
-  },
-];
-
 export const Excel = () => {
-  const [orders, setOrders] = useState<Order[] | null>(initialOrders);
+  const [orders, setOrders] = useState<Order[] | null>(null);
 
   if (orders) {
+    const totalCartons = orders.reduce((acc, order) => {
+      return (
+        acc +
+        order.orderRows.reduce((acc, row) => {
+          return acc + row.Quantity;
+        }, 0)
+      );
+    }, 0);
+
+    const totalPallets = Math.ceil(totalCartons / 30 + 1);
     return (
       <div className='flex h-full flex-col justify-between'>
-        <h1 className='mb-10 justify-self-center text-xl font-bold'>
+        <h1 className='mb-10 flex items-center justify-between justify-self-center text-xl font-bold'>
           Order List
+          <div className='flex gap-2 text-lg'>
+            <span>Total Cartons: {totalCartons}</span>
+            <span>Total Pallets: {totalPallets}</span>
+          </div>
         </h1>
+
         <OrderList orders={orders} />
       </div>
     );

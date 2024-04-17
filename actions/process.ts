@@ -97,6 +97,8 @@ const getOrderId = async (orderNumber: string) => {
   const response = await shopifyQueryAPI(queryBody);
 
   const data = (await response.json()) as OrderIDResponse;
+
+  console.log(data);
   if (!data.data.orders.edges[0]) {
     return;
   }
