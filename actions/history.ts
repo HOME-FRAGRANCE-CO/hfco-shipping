@@ -1,16 +1,16 @@
 'use server';
 import { db } from '@/prisma/db';
-import type { cancelConsignmentResponse } from '@/types';
+import type { CancelConsignmentResponse, ReprintLabelResponse } from '@/types';
 import { revalidatePath } from 'next/cache';
 
-const DF_apiUrl =
-  'https://webservices.directfreight.com.au/Dispatch/api/CancelConsignment/';
+const DF_apiBaseUrl = 'https://webservices.directfreight.com.au/Dispatch/api/';
 const DF_auth = process.env.DF_AUTHORISATION;
 const DF_accNum = process.env.DF_ACCOUNT_NUMBER;
 const DF_senderSiteId = process.env.DF_SENDER_SITE_ID;
 
 export const deleteConsignment = async (consignmentNumber: string) => {
-  const response = await fetch(DF_apiUrl, {
+  const endpoint = 'CancelConsignment';
+  const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ export const deleteConsignment = async (consignmentNumber: string) => {
         }`,
   });
 
-  const data = (await response.json()) as cancelConsignmentResponse;
+  const data = (await response.json()) as CancelConsignmentResponse;
   if (
     !(
       data.ResponseCode === '300' &&
@@ -51,4 +51,41 @@ export const deleteConsignment = async (consignmentNumber: string) => {
     },
   });
   revalidatePath('/processed');
+};
+
+export const reprintLabel = async (consignmentNumber: string) => {
+  const endpoint = 'GetConsignmentLabel';
+  const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorisation: DF_auth!,
+      AccountNumber: DF_accNum!,
+      SiteId: DF_senderSiteId!,
+    },
+    body: `{
+      "LabelPrintStatus":"REPRINT",
+            "ConnoteList":[
+                {
+                    "Connote": ${consignmentNumber}
+                }
+            ]
+        }`,
+  });
+
+  const data = (await response.json()) as ReprintLabelResponse;
+
+  if (data.ResponseCode !== '300' || !data.LabelURL) {
+    if (data.ResponseCode === '411') {
+      if (data.ConnoteList[0].ResponseCode === '410')
+        return { error: 'Cannot reprint label. Connote out of date.' };
+      return { error: 'Cannot reprint label. Connote not found.' };
+    }
+    return { error: 'Failed to reprint label' };
+  }
+
+  const labelUrl = data.LabelURL;
+
+  return { success: labelUrl };
 };

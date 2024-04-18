@@ -122,9 +122,32 @@ export interface Consignment {
   SortCode: string;
 }
 
-export interface cancelConsignmentResponse {
+export interface CancelConsignmentResponse {
   ResponseCode: string;
   ResponseMessage: string;
+  ConnoteList: Connote[];
+}
+
+// {
+//   ResponseCode: '300',
+//   ResponseMessage: 'OK',
+//   LabelURL:
+//     'https://www.directfreight.com.au/dispatch/ViewConnoteLabelsAPI.aspx?id=F8D6F7D2-85B1-4475-89C3-9577A5C4F44F',
+//   LabelPDF: null,
+//   ConnoteList: [
+//     {
+//       Connote: '2424382059951',
+//       ResponseCode: '200',
+//       ResponseMessage: 'OK'
+//     }
+//   ]
+// }
+
+export interface ReprintLabelResponse {
+  ResponseCode: string;
+  ResponseMessage: string;
+  LabelURL: string | null;
+  LabelPDF: string | null;
   ConnoteList: Connote[];
 }
 

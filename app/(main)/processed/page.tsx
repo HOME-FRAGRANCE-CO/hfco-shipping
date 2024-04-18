@@ -33,7 +33,6 @@ const ProcessedOrdersPage = async () => {
                 <ProcessedOrderMenu
                   orderNumber={order.order_number}
                   consignmentNumber={order.consignment_number}
-                  labelUrl={order.label_url}
                 />
               </TableCell>
             </TableRow>

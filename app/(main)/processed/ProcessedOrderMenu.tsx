@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteConsignment } from '@/actions/history';
+import { deleteConsignment, reprintLabel } from '@/actions/history';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { Loader } from '@/components/ui/loader';
@@ -16,17 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
 
 type Props = {
   orderNumber: string;
   consignmentNumber: string;
-  labelUrl: string | null;
 };
 export const ProcessedOrderMenu = ({
   orderNumber,
   consignmentNumber,
-  labelUrl,
 }: Props) => {
   const [pending, startTransition] = useTransition();
 
@@ -35,7 +32,6 @@ export const ProcessedOrderMenu = ({
     startTransition(async () => {
       deleteConsignment(consignmentNumber)
         .then((data) => {
-          console.log(data);
           if (data?.error) {
             toast.error(`Failed to cancel Order ${orderNumber}`, {
               description: data.error,
@@ -43,6 +39,28 @@ export const ProcessedOrderMenu = ({
             return;
           }
           toast.success(`Order ${orderNumber} deleted successfully`);
+        })
+        .catch(() => {
+          toast.error(`Failed to cancel Order ${orderNumber}`, {
+            description:
+              'An unknown error has occurred. Please try again later',
+          });
+        });
+    });
+  };
+
+  const handleDownloadClick = () => {
+    if (pending) return;
+    startTransition(async () => {
+      reprintLabel(consignmentNumber)
+        .then((data) => {
+          if (data?.error) {
+            toast.error(`Failed to download label for Order ${orderNumber}`, {
+              description: data.error,
+            });
+            return;
+          }
+          window.location.assign(data.success!);
         })
         .catch(() => {
           toast.error(`Failed to cancel Order ${orderNumber}`, {
@@ -68,14 +86,12 @@ export const ProcessedOrderMenu = ({
       <DropdownMenuContent align='start'>
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {labelUrl && (
-          <DropdownMenuItem asChild>
-            <Link href={labelUrl}>
-              <DownloadIcon className='mr-2 size-4' />
-              Download
-            </Link>
-          </DropdownMenuItem>
-        )}
+
+        <DropdownMenuItem onClick={handleDownloadClick}>
+          <DownloadIcon className='mr-2 size-4' />
+          Reprint
+        </DropdownMenuItem>
+
         <DropdownMenuItem
           className='text-destructive focus:bg-destructive/10 focus:text-destructive'
           onClick={handleDeleteClick}
