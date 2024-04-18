@@ -7,19 +7,31 @@ import { Button } from '@/components/ui/button';
 import { TrashIcon } from 'lucide-react';
 
 export const Excel = () => {
-  const [orders, setOrders] = useState<Order[] | null>(null);
+  const [orders, setOrders] = useState<Order[] | null>();
 
   if (orders) {
-    const totalCartons = orders.reduce((acc, order) => {
-      return (
-        acc +
-        order.orderRows.reduce((acc, row) => {
-          return acc + row.Quantity;
-        }, 0)
-      );
-    }, 0);
+    const counters = {
+      Carton: 0,
+      Pallet: 0,
+    };
 
-    const totalPallets = Math.ceil(totalCartons / 30 + 1);
+    orders.forEach((order) => {
+      const type = order['Carton/Pallet'];
+      const quantity = order.orderRows.reduce(
+        (acc, row) => acc + row.Quantity,
+        0,
+      );
+
+      if (type === 'Carton') {
+        counters.Carton += quantity;
+      } else if (type === 'Pallet') {
+        counters.Pallet += quantity;
+      }
+    });
+
+    const requiredPallets =
+      Math.ceil(counters.Carton / 30) + counters.Pallet + 1;
+
     return (
       <div className='flex h-full flex-col justify-between'>
         <h1 className='mb-10 flex items-center justify-between justify-self-center text-xl font-bold'>
@@ -36,8 +48,8 @@ export const Excel = () => {
             </Button>
           </div>
           <div className='flex gap-2 text-lg'>
-            <span>Total Cartons: {totalCartons}</span>
-            <span>Total Pallets: {totalPallets}</span>
+            <span>Total Cartons: {counters.Carton}</span>
+            <span>Total Pallets: {requiredPallets}</span>
           </div>
         </h1>
 

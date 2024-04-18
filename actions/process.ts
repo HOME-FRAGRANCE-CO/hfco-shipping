@@ -53,6 +53,8 @@ export const processOrder = async (
   if (!consignmentData) {
     return { error: 'Failed to create consignment data' };
   }
+
+  console.log(consignmentData);
   const consignmentAPIResponse = await sendConsignmentData(
     JSON.stringify(consignmentData),
   );
@@ -98,7 +100,6 @@ const getOrderId = async (orderNumber: string) => {
 
   const data = (await response.json()) as OrderIDResponse;
 
-  console.log(data);
   if (!data.data.orders.edges[0]) {
     return;
   }
@@ -249,11 +250,14 @@ const createConsignmentData = (
           Length: row.Length,
           Width: row.Width,
           Height: row.Height,
-          Cubic: ((row.Length * row.Width * row.Height) / 1000000).toFixed(3),
+          Cubic: Number(
+            ((row.Length * row.Width * row.Height) / 1000000).toFixed(3),
+          ),
         })),
       },
     ],
   };
+  console.log(consignmentData);
 
   return consignmentData;
 };
@@ -264,7 +268,9 @@ const calculateLineKgs = (order: Order, row: OrderRow) => {
     0,
   );
 
-  return (row.Quantity / totalQuantity) * order.totalWeight;
+  const weight = Math.ceil((row.Quantity / totalQuantity) * order.totalWeight);
+
+  return weight;
 };
 
 const sendConsignmentData = async (consignmentBody: string) => {
