@@ -48,7 +48,7 @@ type OrderProps = {
 const Order = ({ key, order }: OrderProps) => {
   const [pending, startTransition] = useTransition();
   const [deliveryNotes, setDeliveryNotes] = useState('');
-  const [consignmentLink, setConsignmentLink] = useState<string | null>('');
+  const [consignmentLink, setConsignmentLink] = useState<string>();
   const [authorityToLeave, setAuthorityToLeave] = useState(false);
   const [orderNotes, setOrderNotes] = useState<OrderNotes | null>(null);
 
@@ -80,7 +80,7 @@ const Order = ({ key, order }: OrderProps) => {
             return;
           }
           toast.success(`Order ${order.orderNumber} processed successfully`);
-          setConsignmentLink(data.success ?? null);
+          setConsignmentLink(data.success ?? undefined);
         })
         .catch(() => {
           toast.error(`Failed to process Order ${order.orderNumber}`, {
@@ -257,7 +257,7 @@ const Order = ({ key, order }: OrderProps) => {
           </Link>
         )}
         <Button
-          disabled={pending}
+          disabled={pending || !!consignmentLink}
           onClick={() => {
             handleProcessClick({
               ...order,
@@ -266,7 +266,13 @@ const Order = ({ key, order }: OrderProps) => {
             });
           }}
         >
-          {pending ? <Loader /> : 'Process Order'}
+          {pending ? (
+            <Loader className='size-4' />
+          ) : consignmentLink ? (
+            'Processed'
+          ) : (
+            'Process Order'
+          )}
         </Button>
       </div>
     </div>

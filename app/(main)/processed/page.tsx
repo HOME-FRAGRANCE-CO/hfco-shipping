@@ -10,9 +10,7 @@ import {
 } from '@/components/ui/table';
 
 const ProcessedOrdersPage = async () => {
-  const processedOrdersData = getProcessedOrders();
-  const [processedOrders] = await Promise.all([processedOrdersData]);
-
+  const processedOrders = await getProcessedOrders();
   return (
     <div className='relative max-h-[800px] overflow-auto'>
       <Table>
