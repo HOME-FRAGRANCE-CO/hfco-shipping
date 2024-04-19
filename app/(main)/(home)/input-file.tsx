@@ -15,7 +15,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '../../../components/ui/button';
 import { readExcelFile } from '@/actions/excel';
-import type { Order } from '@/types';
 import { toast } from 'sonner';
 import { useOrders } from '@/store/use-orders';
 

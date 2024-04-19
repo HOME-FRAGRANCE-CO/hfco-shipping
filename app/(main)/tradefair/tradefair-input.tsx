@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { readCSVFile } from '@/actions/excel';
+import { readCSVFile } from '@/actions/csv';
 import type { Customer } from '@/types';
 import { toast } from 'sonner';
 

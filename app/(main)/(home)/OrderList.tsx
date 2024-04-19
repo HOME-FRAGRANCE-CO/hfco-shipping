@@ -24,6 +24,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ArrowUpRightIcon, DownloadIcon } from 'lucide-react';
+import { useOrders } from '@/store/use-orders';
 
 type Props = {
   orders: Order[];
@@ -52,6 +53,7 @@ const Order = ({ key, order }: OrderProps) => {
   const [consignmentLink, setConsignmentLink] = useState<string>();
   const [authorityToLeave, setAuthorityToLeave] = useState(false);
   const [orderNotes, setOrderNotes] = useState<OrderNotes | null>(null);
+  const { removeOrder } = useOrders();
 
   const handleProcessClick = (
     order: Order & {
@@ -268,7 +270,12 @@ const Order = ({ key, order }: OrderProps) => {
 
       <div className='flex justify-end gap-2 border-t p-2'>
         {consignmentLink && (
-          <Link href={consignmentLink} target='_blank'>
+          <Link
+            href={consignmentLink}
+            rel='noopener noreferrer'
+            target='_blank'
+            onClick={() => removeOrder(order.orderNumber)}
+          >
             <Button variant='link' className='flex gap-1'>
               <DownloadIcon className='size-4' />
               Download Label

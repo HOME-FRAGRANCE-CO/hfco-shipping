@@ -36,6 +36,7 @@ export default function RootLayout({
             theme='light'
             closeButton
             duration={3000}
+            expand
           />
         </body>
       </html>
