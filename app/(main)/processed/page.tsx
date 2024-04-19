@@ -8,9 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Refresh } from './refresh';
 
 const ProcessedOrdersPage = async () => {
   const processedOrders = await getProcessedOrders();
+
   return (
     <div className='relative max-h-[800px] overflow-auto'>
       <Table>
@@ -19,7 +21,9 @@ const ProcessedOrdersPage = async () => {
             <TableHead className='w-[200px]'>Order Number</TableHead>
             <TableHead className='w-[250px]'>Consignment Number</TableHead>
             <TableHead className='w-[200px]'>Processed Date</TableHead>
-            <TableHead></TableHead>
+            <TableHead>
+              <Refresh />
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

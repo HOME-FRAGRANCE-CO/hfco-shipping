@@ -168,6 +168,7 @@ const Order = ({ key, order }: OrderProps) => {
                 setAuthorityToLeave((prevIsChecked) => !prevIsChecked);
               }}
               checked={authorityToLeave}
+              disabled={pending || !!consignmentLink}
             />
             <Label className='text-sm text-slate-400'>
               Authority to Leave?
@@ -248,12 +249,13 @@ const Order = ({ key, order }: OrderProps) => {
           placeholder='Delivery Notes'
           maxLength={255}
           onChange={(e) => setDeliveryNotes(e.target.value)}
+          disabled={pending || !!consignmentLink}
         />
       </div>
 
       <div className='flex justify-end gap-2 border-t p-2'>
         {consignmentLink && (
-          <Link href={consignmentLink}>
+          <Link href={consignmentLink} target='_blank'>
             <Button variant='link' className='flex gap-1'>
               <DownloadIcon className='size-4' />
               Download Label
@@ -271,7 +273,7 @@ const Order = ({ key, order }: OrderProps) => {
           }}
         >
           {pending ? (
-            <Loader className='size-4' />
+            <Loader className='size-4 text-white' />
           ) : consignmentLink ? (
             'Processed'
           ) : (

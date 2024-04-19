@@ -54,12 +54,10 @@ export const processOrder = async (
     return { error: 'Failed to create consignment data' };
   }
 
-  console.log(consignmentData);
   const consignmentAPIResponse = await sendConsignmentData(
     JSON.stringify(consignmentData),
   );
   const consignment = consignmentAPIResponse.ConsignmentList[0];
-  console.log(consignmentAPIResponse);
   if (
     !(
       consignmentAPIResponse.ResponseCode === '300' &&
@@ -77,7 +75,6 @@ export const processOrder = async (
       label_url: consignmentAPIResponse.LabelURL,
     },
   });
-  console.log(consignmentRecord);
   return { success: consignmentAPIResponse.LabelURL };
 };
 
@@ -257,7 +254,6 @@ const createConsignmentData = (
       },
     ],
   };
-  console.log(consignmentData);
 
   return consignmentData;
 };

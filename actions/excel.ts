@@ -31,7 +31,23 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
             reject('Invalid file format');
             return;
           }
-          toast.success('File uploaded successfully');
+          toast.info('File uploaded', {
+            description: 'Remember to book a pick up.',
+            action: {
+              label: 'Book pick up',
+              onClick: () => {
+                window.open(
+                  'https://www.directfreight.com.au/dispatch/AddPickupSelectAddress.aspx',
+                  '_blank',
+                );
+              },
+            },
+            actionButtonStyle: {
+              backgroundColor: '#0973DC',
+              color: 'white',
+              fontWeight: 'semibold',
+            },
+          });
 
           let currentOrderNumber: string | null = null;
           const orders: Order[] = [];
