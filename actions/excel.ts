@@ -29,7 +29,9 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
             reject('Invalid file format');
             return;
           }
+          toast.success('File uploaded successfully');
           toast.info('Remember to book a pick up.', {
+            duration: 10000,
             action: {
               label: 'Book pick up',
               onClick: () => {
@@ -45,7 +47,6 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
               fontWeight: 'semibold',
             },
           });
-          toast.success('File uploaded successfully');
 
           let currentOrderNumber: string | null = null;
           const orders: Order[] = [];

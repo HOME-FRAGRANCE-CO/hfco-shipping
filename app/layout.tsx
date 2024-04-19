@@ -30,14 +30,7 @@ export default function RootLayout({
       <html lang='en'>
         <body className={inter.className}>
           {children}
-          <Toaster
-            richColors
-            position='top-center'
-            theme='light'
-            closeButton
-            duration={3000}
-            expand
-          />
+          <Toaster richColors position='top-center' theme='light' closeButton />
         </body>
       </html>
     </ClerkProvider>
