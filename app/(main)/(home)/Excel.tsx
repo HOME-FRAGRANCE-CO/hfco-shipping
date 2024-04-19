@@ -1,15 +1,14 @@
 'use client';
-import { InputFile } from '@/components/input-file';
-import type { Order } from '@/types';
-import { useState } from 'react';
+import { InputFile } from '@/app/(main)/(home)/input-file';
 import { OrderList } from './OrderList';
 import { Button } from '@/components/ui/button';
 import { TrashIcon } from 'lucide-react';
+import { useOrders } from '@/store/use-orders';
 
 export const Excel = () => {
-  const [orders, setOrders] = useState<Order[] | null>();
+  const { orders, resetOrders } = useOrders();
 
-  if (orders) {
+  if (orders.length > 0) {
     const counters = {
       Carton: 0,
       Pallet: 0,
@@ -41,7 +40,7 @@ export const Excel = () => {
               size='icon'
               variant='destructive'
               onClick={() => {
-                setOrders(null);
+                resetOrders();
               }}
             >
               <TrashIcon />
@@ -59,7 +58,7 @@ export const Excel = () => {
   }
   return (
     <>
-      <InputFile setOrders={setOrders} />
+      <InputFile />
     </>
   );
 };

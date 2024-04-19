@@ -11,12 +11,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from './ui/form';
+} from '../../../components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from './ui/button';
+import { Button } from '../../../components/ui/button';
 import { readExcelFile } from '@/actions/excel';
 import type { Order } from '@/types';
 import { toast } from 'sonner';
+import { useOrders } from '@/store/use-orders';
 
 const formSchema = z.object({
   file: z
@@ -46,11 +47,8 @@ const formSchema = z.object({
     ),
 });
 
-type Props = {
-  setOrders: (orders: Order[]) => void;
-};
-
-export function InputFile({ setOrders }: Props) {
+export function InputFile() {
+  const { setOrders } = useOrders();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {},
