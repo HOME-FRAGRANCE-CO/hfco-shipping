@@ -49,7 +49,7 @@ export const Excel = () => {
           </div>
           <div className='flex gap-2 text-lg'>
             <span>Total Cartons: {counters.Carton}</span>
-            <span>Total Pallets: {requiredPallets}</span>
+            <span>Total Pallets Required: {requiredPallets}</span>
           </div>
         </h1>
 

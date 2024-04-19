@@ -1,5 +1,13 @@
-const Page = () => {
-    return <div></div>;
+import { Tradefair } from './tradefair';
+
+const TradefairPage = () => {
+  return (
+    <main className='flex flex-col items-center justify-center'>
+      <div className='self-start'>
+        <Tradefair />
+      </div>
+    </main>
+  );
 };
 
-export default Page;
+export default TradefairPage;

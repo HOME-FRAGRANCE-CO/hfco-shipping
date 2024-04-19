@@ -23,6 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { DownloadIcon } from 'lucide-react';
 
 type Props = {
   orders: Order[];
@@ -250,10 +251,13 @@ const Order = ({ key, order }: OrderProps) => {
         />
       </div>
 
-      <div className='flex justify-end gap-4 border-t p-2'>
+      <div className='flex justify-end gap-2 border-t p-2'>
         {consignmentLink && (
           <Link href={consignmentLink}>
-            <Button variant='link'>Download Consignment</Button>
+            <Button variant='link' className='flex gap-1'>
+              <DownloadIcon className='size-4' />
+              Download Label
+            </Button>
           </Link>
         )}
         <Button

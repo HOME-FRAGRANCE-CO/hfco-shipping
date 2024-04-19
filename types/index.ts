@@ -13,6 +13,22 @@ export type OrderRow = {
   Quantity: number;
 };
 
+export type Customer = {
+  companyName: string;
+  custName: string;
+  email: string;
+  phone: string;
+  address: CustomerAddress;
+};
+
+export type CustomerAddress = {
+  lineOne: string;
+  zip: string;
+  city: string;
+  province?: string;
+  countryCode: string;
+};
+
 export type ProcessedOrder = {
   id: number;
   order_number: string;
@@ -140,4 +156,24 @@ export interface Connote {
   Connote: string;
   ResponseCode: string;
   ResponseMessage: string;
+}
+
+export interface CreateCompanyResponse {
+  data: {
+    companyCreate: {
+      company: {
+        id: string;
+        name: string;
+        customerSince: string;
+        note: string;
+      } | null;
+      userErrors: UserError[];
+    };
+  };
+  extensions: Extensions;
+}
+
+interface UserError {
+  field: string[];
+  message: string;
 }

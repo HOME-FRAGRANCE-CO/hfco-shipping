@@ -19,6 +19,7 @@ const ProcessedOrdersPage = async () => {
             <TableHead className='w-[200px]'>Order Number</TableHead>
             <TableHead className='w-[250px]'>Consignment Number</TableHead>
             <TableHead className='w-[200px]'>Processed Date</TableHead>
+            <TableHead></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
