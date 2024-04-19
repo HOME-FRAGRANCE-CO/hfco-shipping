@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { createCustomer } from '@/actions/tradefair';
 import { useTransition } from 'react';
 import { toast } from 'sonner';
+import { Loader } from '@/components/ui/loader';
 
 type Props = {
   customers: Customer[];
@@ -281,8 +282,10 @@ const Customer = ({
               />
             </>
           </div>
-          <div className='flex justify-end p-2'>
-            <Button type='submit'>Create Company</Button>
+          <div className='flex justify-end py-2'>
+            <Button type='submit' disabled={pending}>
+              {pending ? <Loader className='text-white' /> : 'Create Company'}
+            </Button>
           </div>
         </form>
       </Form>

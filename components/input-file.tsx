@@ -75,35 +75,35 @@ export function InputFile({ setOrders }: Props) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className='flex items-end gap-2'
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name='file'
           render={({ field }) => (
             <FormItem>
               <FormLabel>File</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder='File'
-                  type='file'
-                  accept='.xlsx'
-                  {...fileRef}
-                  onChange={(event) => {
-                    field.onChange(event.target?.files?.[0] ?? undefined);
-                  }}
-                  onDrop={(event) => {
-                    field.onChange(event.dataTransfer.files?.[0]);
-                  }}
-                />
-              </FormControl>
+              <div className='flex gap-2'>
+                <FormControl>
+                  <Input
+                    placeholder='File'
+                    type='file'
+                    accept='.xlsx'
+                    {...fileRef}
+                    onChange={(event) => {
+                      field.onChange(event.target?.files?.[0] ?? undefined);
+                    }}
+                    onDrop={(event) => {
+                      field.onChange(event.dataTransfer.files?.[0]);
+                    }}
+                  />
+                </FormControl>
+                <Button type='submit'>Upload</Button>
+              </div>
+
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type='submit'>Upload</Button>
       </form>
     </Form>
   );

@@ -8,6 +8,7 @@ import type {
   OrderNotesResponse,
   OrderRow,
 } from '@/types';
+import { revalidatePath } from 'next/cache';
 
 const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
@@ -75,6 +76,7 @@ export const processOrder = async (
       label_url: consignmentAPIResponse.LabelURL,
     },
   });
+  revalidatePath('/processed');
   return { success: consignmentAPIResponse.LabelURL };
 };
 
@@ -254,7 +256,6 @@ const createConsignmentData = (
       },
     ],
   };
-
   return consignmentData;
 };
 
