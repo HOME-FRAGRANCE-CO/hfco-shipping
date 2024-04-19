@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { DownloadIcon } from 'lucide-react';
+import { ArrowUpRightIcon, DownloadIcon } from 'lucide-react';
 
 type Props = {
   orders: Order[];
@@ -191,8 +191,21 @@ const Order = ({ key, order }: OrderProps) => {
                 </div>
               ) : (
                 <div className='space-y-2'>
+                  <div className='flex items-center justify-between '>
+                    <h3 className='font-bold'>Notes</h3>
+                    <Link href={orderNotes.orderUrl} target='_blank'>
+                      <Button
+                        variant='secondary'
+                        className='group text-xs'
+                        size='sm'
+                      >
+                        Open in Shopify
+                        <ArrowUpRightIcon className='ml-1 inline-block h-4 w-4 shrink-0 translate-y-px transition-transform group-hover:-translate-y-1 group-hover:translate-x-1 group-focus-visible:-translate-y-1 group-focus-visible:translate-x-1' />
+                      </Button>
+                    </Link>
+                  </div>
                   <div>
-                    <h4 className='text-sm font-bold'>Order Notes</h4>
+                    <h4 className=' text-sm font-bold'>Order Notes</h4>
                     <p className='text-xs'>
                       {!orderNotes.orderNotes ? (
                         <span className='italic text-slate-400'>

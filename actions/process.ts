@@ -67,7 +67,7 @@ export const processOrder = async (
     return { error: 'Failed to create consignment' };
   }
 
-  const consignmentRecord = await db.consignment.create({
+  await db.consignment.create({
     data: {
       order_number: order.orderNumber,
       consignment_id: consignmentID,
@@ -321,11 +321,16 @@ export const getOrderNotes = async (orderNumber: string) => {
   }`,
   };
 
+  const orderUrl =
+    'https://admin.shopify.com/store/home-fragrance-co-au/orders/' +
+    orderID.split('gid://shopify/Order/')[1];
+
   const response = await shopifyQueryAPI(orderNotesQuery);
 
   const data = (await response.json()) as OrderNotesResponse;
 
   return {
+    orderUrl,
     orderNotes: data.data.order.note,
     customerNotes: data.data.order.customer.note,
     companyNotes:
