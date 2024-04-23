@@ -5,7 +5,6 @@ export const excelHeaders = [
   'Width cm',
   'Height cm',
   'Quantity',
-  'Total Weight kg' || 'Weight kg',
 ];
 
 export const csvHeaders = [
