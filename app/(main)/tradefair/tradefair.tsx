@@ -1,5 +1,5 @@
 'use client';
-import type { Customer } from '@/types';
+import type { Customer } from '@/types/order';
 import { TradefairInput } from './tradefair-input';
 import { useState } from 'react';
 import { CustomerList } from './CustomerList';

@@ -1,5 +1,5 @@
 'use client';
-import type { OrderNotes, Order } from '@/types';
+import type { OrderNotes, Order } from '@/types/order';
 import {
   Table,
   TableBody,

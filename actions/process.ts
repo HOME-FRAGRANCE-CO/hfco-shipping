@@ -1,13 +1,12 @@
 'use server';
 import { db } from '@/prisma/db';
+import type { Order, OrderRow } from '@/types/order';
 import type {
   DirectFreightResponse,
-  Order,
   OrderDetailsResponse,
   OrderIDResponse,
   OrderNotesResponse,
-  OrderRow,
-} from '@/types';
+} from '@/types/response';
 import { revalidatePath } from 'next/cache';
 
 const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;

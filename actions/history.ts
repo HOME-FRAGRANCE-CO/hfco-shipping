@@ -1,6 +1,9 @@
 'use server';
 import { db } from '@/prisma/db';
-import type { CancelConsignmentResponse, ReprintLabelResponse } from '@/types';
+import type {
+  CancelConsignmentResponse,
+  ReprintLabelResponse,
+} from '@/types/response';
 import { revalidatePath } from 'next/cache';
 
 const DF_apiBaseUrl = 'https://webservices.directfreight.com.au/Dispatch/api/';

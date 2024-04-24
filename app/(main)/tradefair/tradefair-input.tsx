@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { readCSVFile } from '@/actions/csv';
-import type { Customer } from '@/types';
+import type { Customer } from '@/types/order';
 import { toast } from 'sonner';
 
 const formSchema = z.object({

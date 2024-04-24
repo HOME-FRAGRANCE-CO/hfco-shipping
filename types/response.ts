@@ -1,52 +1,4 @@
-export type Order = {
-  orderNumber: string;
-  'Carton/Pallet': 'Carton' | 'Pallet';
-  EPAC: string;
-  orderRows: OrderRow[];
-  totalWeight: number;
-};
-
-export type OrderRow = {
-  Length: number;
-  Width: number;
-  Height: number;
-  Quantity: number;
-};
-
-export type Customer = {
-  companyName: string;
-  custName: string;
-  email: string;
-  phone: string;
-  address: CustomerAddress;
-};
-
-export type CustomerAddress = {
-  lineOne: string;
-  zip: string;
-  city: string;
-  province?: string;
-  countryCode: string;
-};
-
-export type ProcessedOrder = {
-  id: number;
-  order_number: string;
-  consignment_number: string;
-  consignment_id: number;
-  processed_date: Date | null;
-  label_url: string | null;
-};
-
-export type OrderNotes = {
-  orderUrl: string;
-  orderNotes: string | null;
-  customerNotes: string | null;
-  companyNotes: string | null;
-  locationNotes: string | null;
-};
-
-//API
+//Shopify API Response Types
 
 export interface OrderIDResponse {
   data: {
@@ -111,6 +63,26 @@ export interface OrderNotesResponse {
   extensions: Extensions;
 }
 
+export interface CreateCompanyResponse {
+  data: {
+    companyCreate: {
+      company: {
+        id: string;
+        name: string;
+        customerSince: string;
+        note: string;
+      } | null;
+      userErrors: UserError[];
+    };
+  };
+  extensions: Extensions;
+}
+
+interface UserError {
+  field: string[];
+  message: string;
+}
+
 interface Extensions {
   cost: {
     requestedQueryCost: number;
@@ -122,6 +94,8 @@ interface Extensions {
     };
   };
 }
+
+//Direct Freight API Response Types
 
 export interface DirectFreightResponse {
   ResponseCode: string;
@@ -157,24 +131,4 @@ export interface Connote {
   Connote: string;
   ResponseCode: string;
   ResponseMessage: string;
-}
-
-export interface CreateCompanyResponse {
-  data: {
-    companyCreate: {
-      company: {
-        id: string;
-        name: string;
-        customerSince: string;
-        note: string;
-      } | null;
-      userErrors: UserError[];
-    };
-  };
-  extensions: Extensions;
-}
-
-interface UserError {
-  field: string[];
-  message: string;
 }

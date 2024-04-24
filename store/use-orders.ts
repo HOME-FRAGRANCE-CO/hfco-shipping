@@ -1,4 +1,4 @@
-import type { Order } from '@/types';
+import type { Order } from '@/types/order';
 import { create } from 'zustand';
 
 type State = {

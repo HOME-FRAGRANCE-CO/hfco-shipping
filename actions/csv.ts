@@ -1,4 +1,4 @@
-import type { Customer } from '@/types';
+import type { Customer } from '@/types/customer';
 import { toast } from 'sonner';
 import ExcelJS from 'exceljs';
 import { Readable } from 'stream';

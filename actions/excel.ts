@@ -2,7 +2,7 @@ import { toast } from 'sonner';
 import { excelHeaders } from '@/constants';
 import { containsAllElements } from '@/utils';
 import ExcelJS from 'exceljs';
-import type { Order } from '@/types';
+import type { Order } from '@/types/order';
 
 export const readExcelFile = async (file: File): Promise<Order[]> => {
   const workbook = new ExcelJS.Workbook();

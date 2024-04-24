@@ -1,6 +1,6 @@
 'use client';
 
-import type { Customer } from '@/types';
+import type { Customer } from '@/types/order';
 
 import { Input } from '@/components/ui/input';
 

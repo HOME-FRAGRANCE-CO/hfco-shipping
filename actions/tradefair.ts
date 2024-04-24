@@ -1,5 +1,6 @@
 'use server';
-import type { CreateCompanyResponse, Customer } from '@/types';
+import type { Customer } from '@/types/customer';
+import type { CreateCompanyResponse } from '@/types/response';
 
 const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
@@ -76,15 +77,3 @@ export const createCustomer = async (customer: Customer) => {
     return { error: data.data.companyCreate.userErrors[0].message };
   }
 };
-
-
-// {
-//   companyCreate: {
-//     company: {
-//       id: 'gid://shopify/Company/1244758321',
-//       name: 'Lukes Test',
-//       customerSince: '2024-04-19T00:40:07Z'
-//     },
-//     userErrors: []
-//   }
-// }
