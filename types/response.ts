@@ -20,6 +20,8 @@ export interface OrderDetailsResponse {
       email: string;
       shippingAddress: {
         company: string;
+        firstName: string | null;
+        lastName: string;
         address1: string;
         address2: string | null;
         city: string;
@@ -27,10 +29,6 @@ export interface OrderDetailsResponse {
         province: string;
         provinceCode: string;
         phone: string;
-      };
-      billingAddress: {
-        firstName: string | null;
-        lastName: string;
       };
     };
   };

@@ -115,6 +115,8 @@ async function getOrderDetails(orderID: string) {
           email
           shippingAddress {
             company
+            firstName
+            lastName
             address1
             address2
             city
@@ -122,10 +124,6 @@ async function getOrderDetails(orderID: string) {
             province
             provinceCode
             phone
-          }
-          billingAddress {
-            firstName
-            lastName
           }
         }
       }
@@ -139,7 +137,11 @@ async function getOrderDetails(orderID: string) {
   return {
     custRef: data.data.order.name,
     companyName: data.data.order.shippingAddress.company,
-    custName: data.data.order.billingAddress.lastName,
+    custName:
+      data.data.order.shippingAddress.firstName +
+        ' ' +
+        data.data.order.shippingAddress.lastName ||
+      data.data.order.shippingAddress.company,
     addressOne: data.data.order.shippingAddress.address1,
     addressTwo: data.data.order.shippingAddress.address2 ?? '',
     suburb: data.data.order.shippingAddress.city,
