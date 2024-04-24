@@ -194,7 +194,9 @@ const Order = ({ key, order }: OrderProps) => {
               ) : (
                 <div className='space-y-2'>
                   <div className='flex items-center justify-between '>
-                    <h3 className='font-bold'>Notes</h3>
+                    <h3 className='text-xs font-bold'>
+                      {orderNotes.companyName}
+                    </h3>
                     <Link href={orderNotes.orderUrl} target='_blank'>
                       <Button
                         variant='secondary'

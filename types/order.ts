@@ -26,6 +26,7 @@ export type ProcessedOrder = {
 
 export type OrderNotes = {
   orderUrl: string;
+  companyName: string;
   orderNotes: string | null;
   customerNotes: string | null;
   companyNotes: string | null;

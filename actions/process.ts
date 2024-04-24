@@ -331,6 +331,8 @@ export const getOrderNotes = async (orderNumber: string) => {
 
   return {
     orderUrl,
+    companyName:
+      data.data.order.customer.companyContactProfiles[0].company.name,
     orderNotes: data.data.order.note,
     customerNotes: data.data.order.customer.note,
     companyNotes:
