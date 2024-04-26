@@ -28,17 +28,13 @@ export const useOrders = create<State & Actions>((set) => ({
     };
 
     orders.forEach((order) => {
-      const type = order['Carton/Pallet'];
-      const quantity = order.orderRows.reduce(
-        (acc, row) => acc + row.Quantity,
-        0,
-      );
+      counters.Carton += order.orderRows.reduce((acc, row) => {
+        return row.packageType === 'Carton' ? acc + row.Quantity : acc;
+      }, 0);
 
-      if (type === 'Carton') {
-        counters.Carton += quantity;
-      } else if (type === 'Pallet') {
-        counters.Pallet += quantity;
-      }
+      counters.Pallet += order.orderRows.reduce((acc, row) => {
+        return row.packageType === 'Pallet' ? acc + row.Quantity : acc;
+      }, 0);
     });
 
     const requiredPallets =

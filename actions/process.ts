@@ -37,6 +37,7 @@ export const processOrder = async (
   }
 
   const orderDetails = await getOrderDetails(orderID);
+
   if (!orderDetails) {
     return { error: 'Failed to get order details' };
   }
@@ -244,7 +245,7 @@ const createConsignmentData = (
         },
 
         ConsignmentLineItems: order.orderRows.map((row) => ({
-          PackageDescription: order['Carton/Pallet'].toUpperCase(),
+          PackageDescription: row.packageType.toUpperCase(),
           Items: row.Quantity,
           Kgs: calculateLineKgs(order, row),
           Length: row.Length,
@@ -257,6 +258,7 @@ const createConsignmentData = (
       },
     ],
   };
+  console.log(consignmentData);
   return consignmentData;
 };
 

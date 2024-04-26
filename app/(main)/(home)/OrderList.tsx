@@ -138,7 +138,7 @@ const Order = ({ key, order }: OrderProps) => {
             {order.orderRows.map((orderRow, index) => (
               <TableRow key={index}>
                 <TableCell className='font-medium'>
-                  {order['Carton/Pallet']}
+                  {orderRow.packageType}
                 </TableCell>
                 <TableCell className='text-right'>{orderRow.Length}</TableCell>
                 <TableCell className='text-right'>{orderRow.Width}</TableCell>

@@ -55,6 +55,14 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
             if (rowNumber === 1) return; // Skip header row
             const orderNumber = row.getCell('A').value as string;
 
+            if (
+              orderNumber === null &&
+              (row.getCell('D').value === null ||
+                row.getCell('E').value === null ||
+                row.getCell('F').value === null)
+            )
+              return resolve(orders);
+
             if (orderNumber !== null) {
               // Extracting order number without the first 2 characters
               const extractedOrderNumber = orderNumber.trim().substring(2);
@@ -65,13 +73,11 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
                 orders.push({
                   orderNumber: extractedOrderNumber,
                   EPAC: row.getCell('B').value as string,
-                  'Carton/Pallet': row.getCell('C').value as
-                    | 'Carton'
-                    | 'Pallet',
                   orderRows: [],
                   totalWeight: row.getCell('H').value as number,
                 });
                 orders[orders.length - 1].orderRows.push({
+                  packageType: row.getCell('C').value as 'Carton' | 'Pallet',
                   Length: row.getCell('D').value as number,
                   Width: row.getCell('E').value as number,
                   Height: row.getCell('F').value as number,
@@ -79,10 +85,11 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
                 });
               }
             } else {
-              // If order number is null, insert row data into the last order object
+              // If order number is null, insert row data into the previous order object
               if (currentOrderNumber !== null) {
-                const lastOrder = orders[orders.length - 1];
-                lastOrder.orderRows.push({
+                const previousOrder = orders[orders.length - 1];
+                previousOrder.orderRows.push({
+                  packageType: row.getCell('C').value as 'Carton' | 'Pallet',
                   Length: row.getCell('D').value as number,
                   Width: row.getCell('E').value as number,
                   Height: row.getCell('F').value as number,
@@ -105,3 +112,45 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
     reader.readAsArrayBuffer(file);
   });
 };
+
+//Logic for if EWE do not put Carton/pallet in each order row.
+// sheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+//   if (rowNumber === 1) return; // Skip header row
+//   const orderNumber = row.getCell('A').value as string;
+
+//   if (orderNumber !== null) {
+//     // Extracting order number without the first 2 characters
+//     const extractedOrderNumber = orderNumber.trim().substring(2);
+
+//     // If a new order number is encountered, create a new order object
+//     if (extractedOrderNumber !== currentOrderNumber) {
+//       currentOrderNumber = extractedOrderNumber;
+//       orders.push({
+//         orderNumber: extractedOrderNumber,
+//         EPAC: row.getCell('B').value as string,
+//         'Carton/Pallet': row.getCell('C').value as
+//           | 'Carton'
+//           | 'Pallet',
+//         orderRows: [],
+//         totalWeight: row.getCell('H').value as number,
+//       });
+//       orders[orders.length - 1].orderRows.push({
+//         Length: row.getCell('D').value as number,
+//         Width: row.getCell('E').value as number,
+//         Height: row.getCell('F').value as number,
+//         Quantity: row.getCell('G').value as number,
+//       });
+//     }
+//   } else {
+//     // If order number is null, insert row data into the last order object
+//     if (currentOrderNumber !== null) {
+//       const lastOrder = orders[orders.length - 1];
+//       lastOrder.orderRows.push({
+//         Length: row.getCell('D').value as number,
+//         Width: row.getCell('E').value as number,
+//         Height: row.getCell('F').value as number,
+//         Quantity: row.getCell('G').value as number,
+//       });
+//     }
+//   }
+// });

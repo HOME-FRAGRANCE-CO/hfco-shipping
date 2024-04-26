@@ -2,18 +2,34 @@
 
 export type Order = {
   orderNumber: string;
-  'Carton/Pallet': 'Carton' | 'Pallet';
   EPAC: string;
   orderRows: OrderRow[];
   totalWeight: number;
 };
 
 export type OrderRow = {
+  packageType: 'Carton' | 'Pallet';
   Length: number;
   Width: number;
   Height: number;
   Quantity: number;
 };
+
+//Types for if EWE do not put Carton/pallet in each order row.
+// export type Order = {
+//   orderNumber: string;
+//   packageType: 'Carton' | 'Pallet';
+//   EPAC: string;
+//   orderRows: OrderRow[];
+//   totalWeight: number;
+// };
+
+// export type OrderRow = {
+//   Length: number;
+//   Width: number;
+//   Height: number;
+//   Quantity: number;
+// };
 
 export type ProcessedOrder = {
   id: number;
