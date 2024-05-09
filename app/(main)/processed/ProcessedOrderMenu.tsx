@@ -38,6 +38,7 @@ export const ProcessedOrderMenu = ({
             });
             return;
           }
+          window.localStorage.removeItem(`consignmentLink-${orderNumber}`);
           toast.success(`Order ${orderNumber} deleted successfully`);
         })
         .catch(() => {

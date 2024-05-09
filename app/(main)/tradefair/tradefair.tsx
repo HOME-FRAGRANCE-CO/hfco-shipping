@@ -13,6 +13,7 @@ const initialCustomers = [
     phone: '61420365322',
     address: {
       lineOne: '112 Dev St',
+      lineTwo: 'Unit 1',
       zip: '2200',
       city: 'Bankstown',
       province: 'NSW',

@@ -8,6 +8,14 @@ import type {
   OrderNotesResponse,
 } from '@/types/response';
 import { revalidatePath } from 'next/cache';
+import * as dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import tz from 'dayjs/plugin/timezone';
+import 'dayjs/locale/en-au';
+
+dayjs.locale('en-au');
+dayjs.extend(utc);
+dayjs.extend(tz);
 
 const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
@@ -67,13 +75,18 @@ export const processOrder = async (
   ) {
     return { error: 'Failed to create consignment' };
   }
-
   await db.consignment.create({
     data: {
       order_number: order.orderNumber,
       consignment_id: consignmentID,
       consignment_number: consignment.Connote,
       label_url: consignmentAPIResponse.LabelURL,
+      processed_date: dayjs
+        .utc()
+        .tz('Australia/Sydney')
+        .format()
+        .substring(0, 19)
+        .concat('Z'),
     },
   });
   revalidatePath('/processed');

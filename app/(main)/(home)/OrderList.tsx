@@ -24,7 +24,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { ArrowUpRightIcon, DownloadIcon } from 'lucide-react';
-import { useOrders } from '@/store/use-orders';
+import { useLocalStorage } from '@uidotdev/usehooks';
 
 type Props = {
   orders: Order[];
@@ -49,11 +49,18 @@ type OrderProps = {
 
 const Order = ({ key, order }: OrderProps) => {
   const [pending, startTransition] = useTransition();
-  const [deliveryNotes, setDeliveryNotes] = useState('');
-  const [consignmentLink, setConsignmentLink] = useState<string>();
-  const [authorityToLeave, setAuthorityToLeave] = useState(false);
+  const [deliveryNotes, setDeliveryNotes] = useLocalStorage(
+    `deliveryNotes-${order.orderNumber}`,
+    '',
+  );
+  const [consignmentLink, setConsignmentLink] = useLocalStorage<
+    string | undefined
+  >(`consignmentLink-${order.orderNumber}`, undefined);
+  const [authorityToLeave, setAuthorityToLeave] = useLocalStorage(
+    `authorityToLeave-${order.orderNumber}`,
+    false,
+  );
   const [orderNotes, setOrderNotes] = useState<OrderNotes | null>(null);
-  const { removeOrder } = useOrders();
 
   const handleProcessClick = (
     order: Order & {
@@ -265,6 +272,7 @@ const Order = ({ key, order }: OrderProps) => {
           className='resize-none'
           placeholder='Delivery Notes'
           maxLength={255}
+          value={deliveryNotes}
           onChange={(e) => setDeliveryNotes(e.target.value)}
           disabled={pending || !!consignmentLink}
         />
@@ -276,7 +284,6 @@ const Order = ({ key, order }: OrderProps) => {
             href={consignmentLink}
             rel='noopener noreferrer'
             target='_blank'
-            onClick={() => removeOrder(order.orderNumber)}
           >
             <Button variant='link' className='flex gap-1'>
               <DownloadIcon className='size-4' />
