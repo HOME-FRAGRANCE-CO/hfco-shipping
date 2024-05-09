@@ -69,6 +69,18 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
               // If a new order number is encountered, create a new order object
               if (extractedOrderNumber !== currentOrderNumber) {
                 currentOrderNumber = extractedOrderNumber;
+
+                let packageType: 'Carton' | 'Pallet';
+                if (
+                  (row.getCell('D').value as number) < 85 &&
+                  (row.getCell('E').value as number) < 85 &&
+                  (row.getCell('F').value as number) < 85
+                ) {
+                  packageType = 'Carton';
+                } else {
+                  packageType = 'Pallet';
+                }
+
                 orders.push({
                   orderNumber: extractedOrderNumber,
                   EPAC: row.getCell('B').value as string,
@@ -76,7 +88,7 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
                   totalWeight: row.getCell('H').value as number,
                 });
                 orders[orders.length - 1].orderRows.push({
-                  packageType: row.getCell('C').value as 'Carton' | 'Pallet',
+                  packageType: packageType,
                   Length: row.getCell('D').value as number,
                   Width: row.getCell('E').value as number,
                   Height: row.getCell('F').value as number,
@@ -87,8 +99,18 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
               // If order number is null, insert row data into the previous order object
               if (currentOrderNumber !== null) {
                 const previousOrder = orders[orders.length - 1];
+                let packageType: 'Carton' | 'Pallet';
+                if (
+                  (row.getCell('D').value as number) < 85 &&
+                  (row.getCell('E').value as number) < 85 &&
+                  (row.getCell('F').value as number) < 85
+                ) {
+                  packageType = 'Carton';
+                } else {
+                  packageType = 'Pallet';
+                }
                 previousOrder.orderRows.push({
-                  packageType: row.getCell('C').value as 'Carton' | 'Pallet',
+                  packageType: packageType,
                   Length: row.getCell('D').value as number,
                   Width: row.getCell('E').value as number,
                   Height: row.getCell('F').value as number,
