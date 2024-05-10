@@ -1,30 +1,45 @@
 'use server';
-import { db } from '@/prisma/db';
-import type { Order, OrderRow } from '@/types/order';
+
+import type { CustomerDetails, Order } from '@/types/order';
 import type {
   DirectFreightResponse,
   OrderDetailsResponse,
   OrderIDResponse,
   OrderNotesResponse,
 } from '@/types/response';
+
+import { db } from '@/prisma/db';
+
 import { revalidatePath } from 'next/cache';
+import { auth } from '@clerk/nextjs/server';
+
 import * as dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import 'dayjs/locale/en-au';
-import { auth } from '@clerk/nextjs/server';
 
+//* Australian Timezone for database
 dayjs.locale('en-au');
 dayjs.extend(utc);
 dayjs.extend(tz);
 
 const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
+//* Shopify API Documentation: https://shopify.dev/docs/api/admin-graphql
 
 const DF_apiUrl = process.env.DF_API_URL;
 const DF_auth = process.env.DF_AUTHORISATION;
 const DF_accNum = process.env.DF_ACCOUNT_NUMBER;
 const DF_senderSiteId = process.env.DF_SENDER_SITE_ID;
+
+//* Direct Freight Consignment API Documentation: https://www.directfreight.com.au/Dispatch/DeveloperHome.aspx
+
+/**
+ * Processes an order by fetching order data from Shopify and
+ * creating a consignment then storing it in the database
+ * @param order - The order to be processed
+ * @returns consignment link if successful, error message if failed
+ */
 
 export const processOrder = async (
   order: Order & {
@@ -33,13 +48,16 @@ export const processOrder = async (
   },
 ) => {
   const { userId } = auth();
+
   if (!userId) {
     throw new Error('Unauthorised');
   }
+
   const orderID = await getOrderId(order.orderNumber);
   if (!orderID) {
     return { error: 'Order not found' };
   }
+  // Search database if order number has already been processed
   const alreadyProcessed = await db.consignment.findFirst({
     where: {
       order_number: order.orderNumber,
@@ -49,9 +67,9 @@ export const processOrder = async (
     return { error: 'Order already processed' };
   }
 
-  const orderDetails = await getOrderDetails(orderID);
+  const customerDetails = await getCustomerDetails(orderID);
 
-  if (!orderDetails) {
+  if (!customerDetails) {
     return { error: 'Failed to get order details' };
   }
   const consignmentID = await getConsignmentIDNumber();
@@ -61,7 +79,7 @@ export const processOrder = async (
 
   const consignmentData = createConsignmentData(
     order,
-    orderDetails,
+    customerDetails,
     consignmentID,
   );
   if (!consignmentData) {
@@ -80,6 +98,8 @@ export const processOrder = async (
   ) {
     return { error: 'Failed to create consignment' };
   }
+
+  // Store consignment data in database
   await db.consignment.create({
     data: {
       order_number: order.orderNumber,
@@ -97,6 +117,18 @@ export const processOrder = async (
   revalidatePath('/processed');
   return { success: consignmentAPIResponse.LabelURL };
 };
+
+/**
+ * Fetches the order ID from Shopify using the order number
+ * @param orderNumber - The order number to be searched for in Shopify
+ * @example
+ * ```ts
+ * getOrderId('#W1234')
+ * ```
+ * Returns 'gid://shopify/Order/1234567890'
+ *
+ * @returns The order ID
+ */
 
 const getOrderId = async (orderNumber: string) => {
   const queryBody = {
@@ -125,7 +157,13 @@ const getOrderId = async (orderNumber: string) => {
   return orderID;
 };
 
-async function getOrderDetails(orderID: string) {
+/**
+ * Fetches the order details from Shopify using the order ID
+ * @param orderID - The order ID to be used to fetch order details from Shopify
+ * @returns The customer details
+ */
+
+async function getCustomerDetails(orderID: string) {
   const orderIDQuery = {
     query: `
       {
@@ -168,9 +206,14 @@ async function getOrderDetails(orderID: string) {
     province: data.data.order.shippingAddress.provinceCode,
     phone: data.data.order.shippingAddress.phone || '',
     email: data.data.order.email,
-  };
+  } as CustomerDetails;
 }
 
+/**
+ * Sends a query to the Shopify GraphQL API
+ * @param queryBody - The GraphQL query to be sent to the Shopify API
+ * @returns The response from the Shopify API
+ */
 const shopifyQueryAPI = async (queryBody: { query: string }) => {
   const response = await fetch(storeDomain!, {
     method: 'POST',
@@ -184,33 +227,33 @@ const shopifyQueryAPI = async (queryBody: { query: string }) => {
   return response;
 };
 
+/**
+ * Helper function to get a unique consignment ID number
+ * @returns A unique consignment ID number
+ */
+
 const getConsignmentIDNumber = async () => {
-  try {
-    let attempts = 0;
-    const maxAttempts = 10;
+  while (true) {
+    const consignmentIdCandidate =
+      Math.floor(Math.random() * (2147483647 - 130 + 1)) + 130;
 
-    while (attempts < maxAttempts) {
-      const consignmentIdCandidate =
-        Math.floor(Math.random() * (2147483647 - 130 + 1)) + 130;
+    // Check if the generated ConsignmentId is unique
+    const isUnique = await isConsignmentIDUnique(consignmentIdCandidate);
 
-      // Check if the generated ConsignmentId is unique
-      const isUnique = await isConsignmentIDUnique(consignmentIdCandidate);
-
-      if (isUnique) {
-        // If unique, return the ConsignmentId
-        return consignmentIdCandidate;
-      }
-      // If not unique, try again
-      attempts++;
+    if (isUnique) {
+      // If unique, return the ConsignmentId
+      return consignmentIdCandidate;
     }
-    return;
-  } catch (error) {
-    return;
-  } finally {
-    await db.$disconnect();
+    // If not unique, try again
   }
 };
-
+/**
+ * Checks if a consignment ID is unique in the database
+ * @param consignmentId - The consignment ID to be checked for uniqueness
+ * @returns if the consignment ID is unique
+ *
+ * @remarks Direct Freight API requires consignment IDs to be unique
+ */
 const isConsignmentIDUnique = async (consignmentId: number) => {
   const existingConsignment = await db.consignment.findFirst({
     where: {
@@ -221,23 +264,19 @@ const isConsignmentIDUnique = async (consignmentId: number) => {
   return !existingConsignment;
 };
 
+/**
+ * Creates the consignment data to be sent to the Direct Freight API
+ * @param order - Order details
+ * @param customerDetails  - Customer details
+ * @param consignmentID - Unique consignment ID
+ * @returns Consignment data to be sent to Direct Freight API
+ */
 const createConsignmentData = (
   order: Order & {
     deliveryNotes: string;
     authorityToLeave: boolean;
   },
-  orderDetails: {
-    custRef: string;
-    companyName: string;
-    custName: string;
-    addressOne: string;
-    addressTwo: string;
-    suburb: string;
-    postcode: string;
-    province: string;
-    phone: string;
-    email: string;
-  },
+  customerDetails: CustomerDetails,
   consignmentID: number,
 ) => {
   const consignmentData = {
@@ -245,27 +284,31 @@ const createConsignmentData = (
       {
         ConsignmentId: consignmentID,
         ConnoteDate: '',
-        CustomerReference: orderDetails.custRef,
+        CustomerReference: customerDetails.custRef,
         IsConsolidate: true,
         ReceiverDetails: {
-          ReceiverName: orderDetails.companyName,
-          AddressLine1: orderDetails.addressOne,
-          AddressLine2: orderDetails.addressTwo,
-          Suburb: orderDetails.suburb,
-          Postcode: orderDetails.postcode,
-          State: orderDetails.province,
+          ReceiverName: customerDetails.companyName,
+          AddressLine1: customerDetails.addressOne,
+          AddressLine2: customerDetails.addressTwo,
+          Suburb: customerDetails.suburb,
+          Postcode: customerDetails.postcode,
+          State: customerDetails.province,
           DeliveryInstructions: order.deliveryNotes,
           isAuthorityToLeave: order.authorityToLeave,
           ReceiverContactName:
-            orderDetails.custName || orderDetails.companyName,
-          ReceiverContactMobile: orderDetails.phone,
-          ReceiverContactEmail: orderDetails.email,
+            customerDetails.custName || customerDetails.companyName,
+          ReceiverContactMobile: customerDetails.phone,
+          ReceiverContactEmail: customerDetails.email,
         },
 
         ConsignmentLineItems: order.orderRows.map((row) => ({
           PackageDescription: row.packageType.toUpperCase(),
           Items: row.Quantity,
-          Kgs: calculateLineKgs(order, row),
+          Kgs: calculateLineKgs(
+            order.orderRows.reduce((acc, row) => acc + row.Quantity, 0),
+            order.totalWeight,
+            row.Quantity,
+          ),
           Length: row.Length,
           Width: row.Width,
           Height: row.Height,
@@ -280,17 +323,28 @@ const createConsignmentData = (
   return consignmentData;
 };
 
-const calculateLineKgs = (order: Order, row: OrderRow) => {
-  const totalQuantity = order.orderRows.reduce(
-    (acc, row) => acc + row.Quantity,
-    0,
-  );
-
-  const weight = Math.ceil((row.Quantity / totalQuantity) * order.totalWeight);
+/**
+ * Helper function to calculate the weight of a line
+ * @param totalQuantity - Total quantity of all items in the order
+ * @param totalWeight - Total weight of all items in the order
+ * @param rowQuantity - Quantity of the line
+ * @returns
+ */
+const calculateLineKgs = (
+  totalQuantity: number,
+  totalWeight: number,
+  rowQuantity: number,
+) => {
+  const weight = Math.ceil((rowQuantity / totalQuantity) * totalWeight);
 
   return weight;
 };
 
+/**
+ * Sends the consignment data to the Direct Freight API
+ * @param consignmentBody - The consignment data to be sent to the Direct Freight API
+ * @returns The response from the Direct Freight API
+ */
 const sendConsignmentData = async (consignmentBody: string) => {
   const response = await fetch(DF_apiUrl!, {
     method: 'POST',
@@ -310,7 +364,11 @@ const sendConsignmentData = async (consignmentBody: string) => {
   return data;
 };
 
-//Order Notes
+/**
+ * Fetches the order notes from Shopify using the order number
+ * @param orderNumber - The order number to be searched for in Shopify
+ * @returns The Order URL, Customer Notes, Company Notes, Location Notes and Order Notes
+ */
 export const getOrderNotes = async (orderNumber: string) => {
   const orderID = await getOrderId(orderNumber);
   if (!orderID) {

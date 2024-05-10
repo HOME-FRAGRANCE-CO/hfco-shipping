@@ -1,9 +1,11 @@
 'use client';
-import { InputFile } from '@/app/(main)/(home)/input-file';
-import { OrderList } from './OrderList';
 import { Button } from '@/components/ui/button';
-import { TrashIcon } from 'lucide-react';
+import { OrderList } from './OrderList';
+import { InputFile } from '@/app/(main)/(home)/input-file';
+
 import { useOrders } from '@/store/use-orders';
+
+import { TrashIcon } from 'lucide-react';
 
 export const Excel = () => {
   const { orders, resetOrders, totalCartons, requiredPallets } = useOrders();

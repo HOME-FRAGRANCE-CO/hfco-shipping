@@ -10,10 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { getOrderNotes, processOrder } from '@/actions/process';
-import Link from 'next/link';
 import { Loader } from '@/components/ui/loader';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -23,8 +20,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import Link from 'next/link';
+
 import { ArrowUpRightIcon, DownloadIcon } from 'lucide-react';
+
+import { useState, useTransition } from 'react';
 import { useLocalStorage } from '@uidotdev/usehooks';
+
+import { getOrderNotes, processOrder } from '@/actions/process';
 
 type Props = {
   orders: Order[];

@@ -1,4 +1,3 @@
-import { getProcessedOrders } from '@/prisma/queries';
 import { ProcessedOrderMenu } from './ProcessedOrderMenu';
 import {
   Table,
@@ -9,6 +8,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Refresh } from './refresh';
+
+import { getProcessedOrders } from '@/prisma/queries';
 
 const ProcessedOrdersPage = async () => {
   const processedOrders = await getProcessedOrders();

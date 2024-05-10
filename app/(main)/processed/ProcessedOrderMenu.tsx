@@ -1,13 +1,8 @@
 'use client';
 
-import { deleteConsignment, reprintLabel } from '@/actions/history';
-import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { Loader } from '@/components/ui/loader';
 import { Button } from '@/components/ui/button';
-
-import { DownloadIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+import { deleteConsignment, reprintLabel } from '@/actions/history';
+import { useTransition } from 'react';
+
+import { DownloadIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
 
 type Props = {
   orderNumber: string;

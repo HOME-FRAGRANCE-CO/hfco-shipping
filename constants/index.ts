@@ -6,15 +6,3 @@ export const excelHeaders = [
   'Height cm',
   'Quantity',
 ];
-
-export const csvHeaders = [
-  'Company Name',
-  'Customer Name',
-  'Shipping Phone',
-  'Shipping Address 1',
-  'Shipping Zip',
-  'Shipping City',
-  'Shipping Province Code',
-  'Shipping Country Code',
-  'Email',
-];

@@ -1,9 +1,11 @@
 'use server';
-import { db } from '@/prisma/db';
+
 import type {
   CancelConsignmentResponse,
   ReprintLabelResponse,
 } from '@/types/response';
+
+import { db } from '@/prisma/db';
 import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 
@@ -12,11 +14,18 @@ const DF_auth = process.env.DF_AUTHORISATION;
 const DF_accNum = process.env.DF_ACCOUNT_NUMBER;
 const DF_senderSiteId = process.env.DF_SENDER_SITE_ID;
 
+/**
+ * Cancels a consignment
+ * @param consignmentNumber - Consignment number to cancel
+ * @returns API response message
+ */
 export const deleteConsignment = async (consignmentNumber: string) => {
   const { userId } = auth();
+
   if (!userId) {
     throw new Error('Unauthorised');
   }
+
   const endpoint = 'CancelConsignment';
   const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
     method: 'POST',
@@ -61,11 +70,18 @@ export const deleteConsignment = async (consignmentNumber: string) => {
   revalidatePath('/processed');
 };
 
+/**
+ * Reprints a label
+ * @param consignmentNumber - Consignment number to reprint label
+ * @returns URL of the new label
+ */
 export const reprintLabel = async (consignmentNumber: string) => {
   const { userId } = auth();
+
   if (!userId) {
     throw new Error('Unauthorised');
   }
+
   const endpoint = 'GetConsignmentLabel';
   const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
     method: 'POST',
