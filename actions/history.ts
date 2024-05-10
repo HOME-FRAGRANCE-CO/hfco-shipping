@@ -4,6 +4,7 @@ import type {
   CancelConsignmentResponse,
   ReprintLabelResponse,
 } from '@/types/response';
+import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 
 const DF_apiBaseUrl = 'https://webservices.directfreight.com.au/Dispatch/api/';
@@ -12,6 +13,10 @@ const DF_accNum = process.env.DF_ACCOUNT_NUMBER;
 const DF_senderSiteId = process.env.DF_SENDER_SITE_ID;
 
 export const deleteConsignment = async (consignmentNumber: string) => {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error('Unauthorised');
+  }
   const endpoint = 'CancelConsignment';
   const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
     method: 'POST',
@@ -57,6 +62,10 @@ export const deleteConsignment = async (consignmentNumber: string) => {
 };
 
 export const reprintLabel = async (consignmentNumber: string) => {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error('Unauthorised');
+  }
   const endpoint = 'GetConsignmentLabel';
   const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
     method: 'POST',

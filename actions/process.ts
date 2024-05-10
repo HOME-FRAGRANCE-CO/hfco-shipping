@@ -12,6 +12,7 @@ import * as dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import 'dayjs/locale/en-au';
+import { auth } from '@clerk/nextjs/server';
 
 dayjs.locale('en-au');
 dayjs.extend(utc);
@@ -31,6 +32,10 @@ export const processOrder = async (
     authorityToLeave: boolean;
   },
 ) => {
+  const { userId } = auth();
+  if (!userId) {
+    throw new Error('Unauthorised');
+  }
   const orderID = await getOrderId(order.orderNumber);
   if (!orderID) {
     return { error: 'Order not found' };
