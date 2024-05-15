@@ -114,9 +114,16 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
                   (row.getCell('F').value as number) < 85
                 ) {
                   packageType = 'Carton';
+
+                  !sheet.getRow(rowNumber - 1).getCell('H').isMerged &&
+                    row.getCell('H').isMerged &&
+                    (previousOrder.totalWeight += row.getCell('H')
+                      .value as number);
                 } else {
                   packageType = 'Pallet';
+                  previousOrder.totalWeight += row.getCell('H').value as number;
                 }
+
                 previousOrder.orderRows.push({
                   packageType: packageType,
                   Length: row.getCell('D').value as number,
