@@ -17,6 +17,7 @@ import * as dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import 'dayjs/locale/en-au';
+import { extractOrderNumber } from '@/utils';
 
 //* Australian Timezone for database
 dayjs.locale('en-au');
@@ -53,7 +54,7 @@ export const processOrder = async (
     throw new Error('Unauthorised');
   }
 
-  const orderID = await getOrderId(order.orderNumber);
+  const orderID = await getOrderId(extractOrderNumber(order.orderNumber));
   if (!orderID) {
     return { error: 'Order not found' };
   }
@@ -370,7 +371,7 @@ const sendConsignmentData = async (consignmentBody: string) => {
  * @returns The Order URL, Customer Notes, Company Notes, Location Notes and Order Notes
  */
 export const getOrderNotes = async (orderNumber: string) => {
-  const orderID = await getOrderId(orderNumber);
+  const orderID = await getOrderId(extractOrderNumber(orderNumber));
   if (!orderID) {
     throw new Error('Order not found');
   }

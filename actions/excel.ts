@@ -71,8 +71,9 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
               return resolve(orders);
 
             if (orderNumber !== null) {
-              // Extracting order number without the first 2 characters
-              const extractedOrderNumber = orderNumber.trim().substring(2);
+              const extractedOrderNumber = orderNumber
+                .trim()
+                .replace(/hf/gi, '');
 
               // If a new order number is encountered, create a new order object
               if (extractedOrderNumber !== currentOrderNumber) {
@@ -114,15 +115,17 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
                   (row.getCell('F').value as number) < 85
                 ) {
                   packageType = 'Carton';
-
-                  !sheet.getRow(rowNumber - 1).getCell('H').isMerged &&
-                    row.getCell('H').isMerged &&
-                    (previousOrder.totalWeight += row.getCell('H')
-                      .value as number);
                 } else {
                   packageType = 'Pallet';
-                  previousOrder.totalWeight += row.getCell('H').value as number;
                 }
+                //Add weight if row is not merged
+                (!row.getCell('H').isMerged ||
+                  //or row is merged but previous package type is different
+                  (row.getCell('H').isMerged &&
+                    previousOrder.orderRows[previousOrder.orderRows.length - 1]
+                      .packageType != packageType)) &&
+                  (previousOrder.totalWeight += row.getCell('H')
+                    .value as number);
 
                 previousOrder.orderRows.push({
                   packageType: packageType,

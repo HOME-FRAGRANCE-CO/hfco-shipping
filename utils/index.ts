@@ -13,3 +13,14 @@ export const containsAllElements = (
 
   return lowerArr2.every((value) => lowerArr1.includes(value));
 };
+
+export function extractOrderNumber(orderNumber: string) {
+  const result = orderNumber.match(/\d+/g);
+
+  const numbers = result ? result.join('') : '';
+
+  const firstFourNumbers = numbers.slice(0, 4);
+
+  // Prepend "#W" to the extracted numbers
+  return `#W${firstFourNumbers}`;
+}
