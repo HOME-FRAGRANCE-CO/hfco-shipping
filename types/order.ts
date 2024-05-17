@@ -5,6 +5,9 @@ export type Order = {
   EPAC: string;
   orderRows: OrderRow[];
   totalWeight: number;
+  authorityToLeave: boolean;
+  deliveryNotes: string;
+  consignmentLink: string | null;
 };
 
 export type OrderRow = {

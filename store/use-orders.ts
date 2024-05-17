@@ -10,6 +10,12 @@ type State = {
 
 type Actions = {
   setOrders: (orders: Order[]) => void;
+  setAuthorityToLeave: (orderNumber: string, authorityToLeave: boolean) => void;
+  setDeliveryNotes: (orderNumber: string, deliveryNotes: string) => void;
+  setConsignmentLink: (
+    orderNumber: string,
+    consignmentLink: string | null,
+  ) => void;
   removeOrder: (orderNumber: string) => void;
   resetOrders: () => void;
 };
@@ -45,6 +51,30 @@ export const useOrders = create<State & Actions>()(
 
         set({ orders, totalCartons: counters.Carton, requiredPallets });
       },
+      setDeliveryNotes: (orderNumber, deliveryNotes) =>
+        set((state) => ({
+          orders: state.orders.map((order) =>
+            order.orderNumber === orderNumber
+              ? { ...order, deliveryNotes }
+              : order,
+          ),
+        })),
+      setAuthorityToLeave: (orderNumber, authorityToLeave) =>
+        set((state) => ({
+          orders: state.orders.map((order) =>
+            order.orderNumber === orderNumber
+              ? { ...order, authorityToLeave }
+              : order,
+          ),
+        })),
+      setConsignmentLink: (orderNumber, consignmentLink) =>
+        set((state) => ({
+          orders: state.orders.map((order) =>
+            order.orderNumber === orderNumber
+              ? { ...order, consignmentLink }
+              : order,
+          ),
+        })),
       removeOrder: (orderNumber) =>
         set((state) => ({
           orders: state.orders.filter(

@@ -16,6 +16,7 @@ import { deleteConsignment, reprintLabel } from '@/actions/history';
 import { useTransition } from 'react';
 
 import { DownloadIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
+import { useOrders } from '@/store/use-orders';
 
 type Props = {
   orderNumber: string;
@@ -26,6 +27,7 @@ export const ProcessedOrderMenu = ({
   consignmentNumber,
 }: Props) => {
   const [pending, startTransition] = useTransition();
+  const { setConsignmentLink } = useOrders();
 
   const handleDeleteClick = async () => {
     if (pending) return;
@@ -38,7 +40,7 @@ export const ProcessedOrderMenu = ({
             });
             return;
           }
-          window.localStorage.removeItem(`consignmentLink-${orderNumber}`);
+          setConsignmentLink(orderNumber, null);
           toast.success(`Order ${orderNumber} deleted successfully`);
         })
         .catch(() => {

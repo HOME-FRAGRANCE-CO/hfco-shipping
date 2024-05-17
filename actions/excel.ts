@@ -95,6 +95,9 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
                   EPAC: row.getCell('B').value as string,
                   orderRows: [],
                   totalWeight: row.getCell('H').value as number,
+                  authorityToLeave: false,
+                  deliveryNotes: '',
+                  consignmentLink: null,
                 });
                 orders[orders.length - 1].orderRows.push({
                   packageType: packageType,

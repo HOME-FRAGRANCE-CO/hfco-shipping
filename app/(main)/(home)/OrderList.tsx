@@ -25,23 +25,75 @@ import Link from 'next/link';
 import { ArrowUpRightIcon, DownloadIcon } from 'lucide-react';
 
 import { useState, useTransition } from 'react';
-import { useLocalStorage } from '@uidotdev/usehooks';
 
 import { getOrderNotes, processOrder } from '@/actions/process';
+
+import { useOrders } from '@/store/use-orders';
 
 type Props = {
   orders: Order[];
 };
 
 export const OrderList = ({ orders }: Props) => {
+  const [pending, startTransition] = useTransition();
+  const { setConsignmentLink } = useOrders();
+  const handleProcessAll = () => {
+    if (pending) return;
+    startTransition(() => {
+      orders.forEach((order) => {
+        processOrder(order)
+          .then((data) => {
+            if (data.error) {
+              toast.error(`Failed to process Order ${order.orderNumber}`, {
+                description: data.error,
+              });
+              data.error === 'Order already processed' &&
+                setConsignmentLink(order.orderNumber, 'Already Processed');
+              return;
+            }
+            toast.success(`Order ${order.orderNumber} processed successfully`);
+            setConsignmentLink(order.orderNumber, data.success ?? null);
+          })
+          .catch(() => {
+            toast.error(`Failed to process Order ${order.orderNumber}`, {
+              description:
+                'An error occurred while processing the order. Please try again later.',
+            });
+          });
+      });
+    });
+  };
   return (
-    <>
-      <ul className='grid grid-cols-3 gap-x-4 gap-y-8'>
-        {orders.map((order) => (
-          <Order key={order.orderNumber} order={order} />
-        ))}
-      </ul>
-    </>
+    <div className='flex min-h-[450px] w-[1400px] flex-col space-y-2'>
+      <div className='flex justify-end'>
+        <Button
+          disabled={pending}
+          size='lg'
+          className='text-lg'
+          onClick={handleProcessAll}
+        >
+          Process All
+        </Button>
+      </div>
+      {pending ? (
+        <div className='flex flex-1 flex-col items-center gap-3'>
+          <h2 className='text-2xl font-bold text-neutral-500'>
+            Processing Orders
+          </h2>
+          <div className='flex animate-pulse flex-row space-x-2'>
+            <div className='size-4 animate-bounce rounded-full bg-neutral-500 [animation-delay:-0.3s] '></div>
+            <div className='size-4 animate-bounce rounded-full bg-neutral-500 [animation-delay:-0.15s] '></div>
+            <div className='size-4 animate-bounce rounded-full bg-neutral-500 '></div>
+          </div>
+        </div>
+      ) : (
+        <ul className='grid grid-cols-3 gap-x-4 gap-y-8'>
+          {orders.map((order) => (
+            <Order key={order.orderNumber} order={order} />
+          ))}
+        </ul>
+      )}
+    </div>
   );
 };
 
@@ -52,25 +104,11 @@ type OrderProps = {
 
 const Order = ({ key, order }: OrderProps) => {
   const [pending, startTransition] = useTransition();
-  const [deliveryNotes, setDeliveryNotes] = useLocalStorage(
-    `deliveryNotes-${order.orderNumber}`,
-    '',
-  );
-  const [consignmentLink, setConsignmentLink] = useLocalStorage<
-    string | undefined
-  >(`consignmentLink-${order.orderNumber}`, undefined);
-  const [authorityToLeave, setAuthorityToLeave] = useLocalStorage(
-    `authorityToLeave-${order.orderNumber}`,
-    false,
-  );
+  const { setAuthorityToLeave, setDeliveryNotes, setConsignmentLink } =
+    useOrders();
   const [orderNotes, setOrderNotes] = useState<OrderNotes | null>(null);
 
-  const handleProcessClick = (
-    order: Order & {
-      deliveryNotes: string;
-      authorityToLeave: boolean;
-    },
-  ) => {
+  const handleProcessClick = (order: Order) => {
     if (pending) return;
     startTransition(() => {
       processOrder(order)
@@ -93,7 +131,7 @@ const Order = ({ key, order }: OrderProps) => {
             return;
           }
           toast.success(`Order ${order.orderNumber} processed successfully`);
-          setConsignmentLink(data.success ?? undefined);
+          setConsignmentLink(order.orderNumber, data.success ?? null);
         })
         .catch(() => {
           toast.error(`Failed to process Order ${order.orderNumber}`, {
@@ -177,10 +215,10 @@ const Order = ({ key, order }: OrderProps) => {
           <div className='flex items-center gap-2 py-4'>
             <Checkbox
               onCheckedChange={() => {
-                setAuthorityToLeave((prevIsChecked) => !prevIsChecked);
+                setAuthorityToLeave(order.orderNumber, !order.authorityToLeave);
               }}
-              checked={authorityToLeave}
-              disabled={pending || !!consignmentLink}
+              checked={order.authorityToLeave}
+              disabled={pending || !!order.consignmentLink}
             />
             <Label className='text-sm text-slate-400'>
               Authority to Leave?
@@ -275,41 +313,38 @@ const Order = ({ key, order }: OrderProps) => {
           className='resize-none'
           placeholder='Delivery Notes'
           maxLength={255}
-          value={deliveryNotes}
-          onChange={(e) => setDeliveryNotes(e.target.value)}
-          disabled={pending || !!consignmentLink}
+          value={order.deliveryNotes}
+          onChange={(e) => setDeliveryNotes(order.orderNumber, e.target.value)}
+          disabled={pending || !!order.consignmentLink}
         />
       </div>
 
       <div className='flex justify-end gap-2 border-t p-2'>
-        {consignmentLink && (
-          <Link
-            href={consignmentLink}
-            rel='noopener noreferrer'
-            target='_blank'
-          >
-            <Button variant='link' className='flex gap-1'>
-              <DownloadIcon className='size-4' />
-              Download Label
-            </Button>
-          </Link>
-        )}
+        {order.consignmentLink &&
+          order.consignmentLink != 'Already Processed' && (
+            <Link
+              href={order.consignmentLink}
+              rel='noopener noreferrer'
+              target='_blank'
+            >
+              <Button variant='link' className='flex gap-1'>
+                <DownloadIcon className='size-4' />
+                Download Label
+              </Button>
+            </Link>
+          )}
         <Button
-          disabled={pending || !!consignmentLink}
+          disabled={pending || !!order.consignmentLink}
           onClick={() => {
-            handleProcessClick({
-              ...order,
-              deliveryNotes,
-              authorityToLeave,
-            });
+            handleProcessClick(order);
           }}
         >
           {pending ? (
             <Loader className='size-4 text-white' />
-          ) : consignmentLink ? (
+          ) : order.consignmentLink ? (
             'Processed'
           ) : (
-            'Process Order'
+            'Process'
           )}
         </Button>
       </div>
