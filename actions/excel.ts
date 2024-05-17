@@ -121,9 +121,9 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
                 } else {
                   packageType = 'Pallet';
                 }
-                //Add weight if row is not merged
+                //Add weight if cell is not merged
                 (!row.getCell('H').isMerged ||
-                  //or row is merged but previous package type is different
+                  //or cell is merged but previous package type is different
                   (row.getCell('H').isMerged &&
                     previousOrder.orderRows[previousOrder.orderRows.length - 1]
                       .packageType != packageType)) &&
