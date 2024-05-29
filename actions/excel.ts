@@ -73,7 +73,7 @@ export const readExcelFile = async (file: File): Promise<Order[]> => {
             if (orderNumber !== null) {
               const extractedOrderNumber = orderNumber
                 .trim()
-                .replace(/hf/gi, '');
+                .replace(/hf2?/gi, '');
 
               // If a new order number is encountered, create a new order object
               if (extractedOrderNumber !== currentOrderNumber) {

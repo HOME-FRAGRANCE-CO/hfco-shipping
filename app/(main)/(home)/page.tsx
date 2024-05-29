@@ -8,7 +8,7 @@ export default function Home() {
       <div className='flex w-full justify-between'>
         <div />
         <Info />
-        {/* <AddOrder /> */}
+
         <div />
       </div>
 

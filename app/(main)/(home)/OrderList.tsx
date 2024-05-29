@@ -22,13 +22,19 @@ import {
 } from '@/components/ui/popover';
 import Link from 'next/link';
 
-import { ArrowUpRightIcon, DownloadIcon } from 'lucide-react';
+import { ArrowUpRightIcon, CircleHelpIcon, DownloadIcon } from 'lucide-react';
 
 import { useState, useTransition } from 'react';
 
 import { getOrderNotes, processOrder } from '@/actions/process';
 
 import { useOrders } from '@/store/use-orders';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Props = {
   orders: Order[];
@@ -65,7 +71,7 @@ export const OrderList = ({ orders }: Props) => {
   };
   return (
     <div className='flex min-h-[450px] w-[1400px] flex-col space-y-2'>
-      <div className='flex justify-end'>
+      <div className='flex items-start justify-start gap-1'>
         <Button
           disabled={pending}
           size='lg'
@@ -74,6 +80,20 @@ export const OrderList = ({ orders }: Props) => {
         >
           Process All
         </Button>
+        <HoverCard>
+          <HoverCardTrigger className='text-neutral-400'>
+            <CircleHelpIcon className='size-4' />
+          </HoverCardTrigger>
+          <HoverCardContent side='top' align='start' className='text-sm'>
+            Consignments can be cancelled by going to{' '}
+            <Link
+              href='/processed'
+              className=' italic underline hover:text-neutral-500'
+            >
+              Processed
+            </Link>
+          </HoverCardContent>
+        </HoverCard>
       </div>
       {pending ? (
         <div className='flex flex-1 flex-col items-center gap-3'>
@@ -234,11 +254,9 @@ const Order = ({ key, order }: OrderProps) => {
                 View Order Notes
               </Button>
             </PopoverTrigger>
-            <PopoverContent align='start' side='top'>
+            <PopoverContent align='start' side='top' className='w-[425px]'>
               {!orderNotes ? (
-                <div className='flex items-center justify-center'>
-                  <Loader />
-                </div>
+                <SkeletonCard />
               ) : (
                 <div className='space-y-2'>
                   <div className='flex items-center justify-between '>
@@ -347,6 +365,41 @@ const Order = ({ key, order }: OrderProps) => {
             'Process'
           )}
         </Button>
+      </div>
+    </div>
+  );
+};
+
+const SkeletonCard = () => {
+  return (
+    <div className='space-y-2'>
+      <div className='flex items-center justify-between '>
+        <Skeleton className='h-4 w-[150px]' />
+        <Button
+          variant='secondary'
+          className='group text-xs'
+          size='sm'
+          disabled
+        >
+          Open in Shopify
+          <ArrowUpRightIcon className='ml-1 inline-block h-4 w-4 shrink-0 translate-y-px transition-transform group-hover:-translate-y-1 group-hover:translate-x-1 group-focus-visible:-translate-y-1 group-focus-visible:translate-x-1' />
+        </Button>
+      </div>
+      <div>
+        <h4 className=' text-sm font-bold'>Order Notes</h4>
+        <Skeleton className='h-4 w-[300px]' />
+      </div>
+      <div>
+        <h4 className='text-sm font-bold'>Customer Notes</h4>
+        <Skeleton className='h-4 w-[300px]' />
+      </div>
+      <div>
+        <h4 className='text-sm font-bold'>Company Notes</h4>
+        <Skeleton className='h-4 w-[300px]' />
+      </div>
+      <div>
+        <h4 className='text-sm font-bold'>Location Notes</h4>
+        <Skeleton className='h-4 w-[300px]' />
       </div>
     </div>
   );
