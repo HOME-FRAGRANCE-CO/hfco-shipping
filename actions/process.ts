@@ -286,7 +286,7 @@ const createConsignmentData = (
         ConsignmentId: consignmentID,
         ConnoteDate: '',
         CustomerReference: customerDetails.custRef,
-        IsConsolidate: true,
+        IsConsolidate: false,
         ReceiverDetails: {
           ReceiverName: customerDetails.companyName,
           AddressLine1: customerDetails.addressOne,

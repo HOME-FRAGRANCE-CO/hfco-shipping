@@ -42,7 +42,7 @@ type Props = {
 
 export const OrderList = ({ orders }: Props) => {
   const [pending, startTransition] = useTransition();
-  const { setConsignmentLink } = useOrders();
+  const { setConsignmentLink, totalCartons, requiredPallets } = useOrders();
   const handleProcessAll = () => {
     if (pending) return;
     startTransition(() => {
@@ -71,30 +71,37 @@ export const OrderList = ({ orders }: Props) => {
   };
   return (
     <div className='flex min-h-[450px] w-[1400px] flex-col space-y-2'>
-      <div className='flex items-start justify-start gap-1'>
-        <Button
-          disabled={pending}
-          size='lg'
-          className='text-lg'
-          onClick={handleProcessAll}
-        >
-          Process All
-        </Button>
-        <HoverCard>
-          <HoverCardTrigger className='text-neutral-400'>
-            <CircleHelpIcon className='size-4' />
-          </HoverCardTrigger>
-          <HoverCardContent side='top' align='start' className='text-sm'>
-            Consignments can be cancelled by going to{' '}
-            <Link
-              href='/processed'
-              className=' italic underline hover:text-neutral-500'
-            >
-              Processed
-            </Link>
-          </HoverCardContent>
-        </HoverCard>
+      <div className='flex items-center justify-between'>
+        <div className='flex gap-1'>
+          <Button
+            disabled={pending}
+            size='lg'
+            className='text-lg'
+            onClick={handleProcessAll}
+          >
+            Process All
+          </Button>
+          <HoverCard>
+            <HoverCardTrigger className='text-neutral-400'>
+              <CircleHelpIcon className='size-4' />
+            </HoverCardTrigger>
+            <HoverCardContent side='top' align='start' className='text-sm'>
+              Consignments can be cancelled by going to{' '}
+              <Link
+                href='/processed'
+                className=' italic underline hover:text-neutral-500'
+              >
+                Processed
+              </Link>
+            </HoverCardContent>
+          </HoverCard>
+        </div>
+        <div className='flex flex-col items-end text-lg font-bold'>
+          <p>Total Cartons: {totalCartons}</p>
+          <p>Pallets Required: {requiredPallets}</p>
+        </div>
       </div>
+
       {pending ? (
         <div className='flex flex-1 flex-col items-center gap-3'>
           <h2 className='text-2xl font-bold text-neutral-500'>

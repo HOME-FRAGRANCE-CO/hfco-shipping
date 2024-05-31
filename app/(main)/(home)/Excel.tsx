@@ -8,7 +8,7 @@ import { useOrders } from '@/store/use-orders';
 import { TrashIcon } from 'lucide-react';
 
 export const Excel = () => {
-  const { orders, resetOrders, totalCartons, requiredPallets } = useOrders();
+  const { orders, resetOrders } = useOrders();
 
   if (orders.length > 0) {
     return (
@@ -25,10 +25,6 @@ export const Excel = () => {
             >
               <TrashIcon />
             </Button>
-          </div>
-          <div className='flex gap-2 text-lg'>
-            <span>Total Cartons: {totalCartons}</span>
-            <span>Total Pallets Required: {requiredPallets}</span>
           </div>
         </h1>
 
