@@ -336,8 +336,7 @@ const calculateLineKgs = (
   totalWeight: number,
   rowQuantity: number,
 ) => {
-  const weight = Math.ceil((rowQuantity / totalQuantity) * totalWeight);
-
+  const weight = Math.round((rowQuantity / totalQuantity) * totalWeight);
   return weight;
 };
 
