@@ -1,5 +1,13 @@
 'use client';
 
+import type { ProcessedOrder } from '@/types/order';
+
+import { useTransition } from 'react';
+import { useOrders } from '@/store/use-orders';
+import { deleteConsignment, reprintLabel } from '@/actions/history';
+
+import { DownloadIcon, MoreHorizontalIcon, TrashIcon } from 'lucide-react';
+
 import { toast } from 'sonner';
 import { Loader } from '@/components/ui/loader';
 import { Button } from '@/components/ui/button';
@@ -12,36 +20,29 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import { deleteConsignment, reprintLabel } from '@/actions/history';
-import { useTransition } from 'react';
-
-import { DownloadIcon, MoreHorizontalIcon, TrashIcon } from 'lucide-react';
-import { useOrders } from '@/store/use-orders';
-
 type Props = {
-  orderNumber: string;
-  consignmentNumber: string;
+  order: ProcessedOrder;
 };
-export const Actions = ({ orderNumber, consignmentNumber }: Props) => {
+export const Actions = ({ order }: Props) => {
   const [pending, startTransition] = useTransition();
   const { setConsignmentLink } = useOrders();
 
   const handleDeleteClick = async () => {
     if (pending) return;
     startTransition(async () => {
-      deleteConsignment(consignmentNumber)
+      deleteConsignment(order.consignment_number)
         .then((data) => {
           if (data?.error) {
-            toast.error(`Failed to cancel Order ${orderNumber}`, {
+            toast.error(`Failed to cancel Order ${order.order_number}`, {
               description: data.error,
             });
             return;
           }
-          setConsignmentLink(orderNumber, null);
-          toast.success(`Order ${orderNumber} deleted successfully`);
+          setConsignmentLink(order.order_number, null);
+          toast.success(`Order ${order.order_number} deleted successfully`);
         })
         .catch(() => {
-          toast.error(`Failed to cancel Order ${orderNumber}`, {
+          toast.error(`Failed to cancel Order ${order.order_number}`, {
             description:
               'An unknown error has occurred. Please try again later',
           });
@@ -52,18 +53,21 @@ export const Actions = ({ orderNumber, consignmentNumber }: Props) => {
   const handleDownloadClick = () => {
     if (pending) return;
     startTransition(async () => {
-      reprintLabel(consignmentNumber)
+      reprintLabel(order.consignment_number)
         .then((data) => {
           if (data?.error) {
-            toast.error(`Failed to download label for Order ${orderNumber}`, {
-              description: data.error,
-            });
+            toast.error(
+              `Failed to download label for Order ${order.order_number}`,
+              {
+                description: data.error,
+              },
+            );
             return;
           }
           window.location.assign(data.success!);
         })
         .catch(() => {
-          toast.error(`Failed to cancel Order ${orderNumber}`, {
+          toast.error(`Failed to cancel Order ${order.order_number}`, {
             description:
               'An unknown error has occurred. Please try again later',
           });

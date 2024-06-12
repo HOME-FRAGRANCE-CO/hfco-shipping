@@ -1,4 +1,3 @@
-import { Footer } from './footer';
 import { Header } from './header';
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
@@ -10,7 +9,6 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
           <div className='mx-auto h-full max-w-[1400px]'>{children}</div>
         </main>
       </div>
-      <Footer />
     </div>
   );
 };

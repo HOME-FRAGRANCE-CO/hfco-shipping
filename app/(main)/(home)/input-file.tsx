@@ -18,6 +18,7 @@ import { useOrders } from '@/store/use-orders';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { UploadIcon } from 'lucide-react';
 
 const formSchema = z.object({
   file: z
@@ -95,7 +96,10 @@ export function InputFile() {
                     }}
                   />
                 </FormControl>
-                <Button type='submit'>Upload</Button>
+                <Button size='sm' type='submit'>
+                  <UploadIcon className='mr-2 size-4' />
+                  Upload
+                </Button>
               </div>
 
               <FormMessage />

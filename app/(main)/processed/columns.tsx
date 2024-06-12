@@ -48,12 +48,7 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
-      return (
-        <Actions
-          orderNumber={row.original.order_number}
-          consignmentNumber={row.original.consignment_number}
-        />
-      );
+      return <Actions order={row.original} />;
     },
   },
 ];
