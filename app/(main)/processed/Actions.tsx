@@ -15,17 +15,14 @@ import {
 import { deleteConsignment, reprintLabel } from '@/actions/history';
 import { useTransition } from 'react';
 
-import { DownloadIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react';
+import { DownloadIcon, MoreHorizontalIcon, TrashIcon } from 'lucide-react';
 import { useOrders } from '@/store/use-orders';
 
 type Props = {
   orderNumber: string;
   consignmentNumber: string;
 };
-export const ProcessedOrderMenu = ({
-  orderNumber,
-  consignmentNumber,
-}: Props) => {
+export const Actions = ({ orderNumber, consignmentNumber }: Props) => {
   const [pending, startTransition] = useTransition();
   const { setConsignmentLink } = useOrders();
 
@@ -82,7 +79,7 @@ export const ProcessedOrderMenu = ({
           {pending ? (
             <Loader className='size-4' />
           ) : (
-            <MoreVerticalIcon className='size-4' />
+            <MoreHorizontalIcon className='size-4' />
           )}
         </Button>
       </DropdownMenuTrigger>

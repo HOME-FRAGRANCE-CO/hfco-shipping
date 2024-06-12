@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Pagination,
   PaginationContent,
@@ -7,6 +8,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import { Select, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -16,68 +18,110 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MoreVerticalIcon, RotateCwIcon } from 'lucide-react';
+import {
+  ArrowUpDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronsLeftIcon,
+  ChevronsRightIcon,
+  MoreHorizontalIcon,
+} from 'lucide-react';
 
 export default function Loading() {
   return (
     <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className='w-[200px]'>Order Number</TableHead>
-            <TableHead className='w-[250px]'>Consignment Number</TableHead>
-            <TableHead className='w-[200px]'>Processed Date</TableHead>
-            <TableHead>
-              <Button size='icon' variant='ghost' className='group' disabled>
-                <RotateCwIcon className={' size-4 animate-spin'} />
-              </Button>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <SkeletonRow />
-          <SkeletonRow />
-          <SkeletonRow />
-          <SkeletonRow />
-          <SkeletonRow />
-          <SkeletonRow />
-          <SkeletonRow />
-          <SkeletonRow />
-          <SkeletonRow />
-          <SkeletonRow />
-        </TableBody>
-      </Table>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href=''
-              className='pointer-events-none opacity-50'
-            />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href='' className='pointer-events-none opacity-50'>
-              1
-            </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href='' className='pointer-events-none opacity-50'>
-              2
-            </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href='' className='pointer-events-none opacity-50'>
-              3
-            </PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext
-              href=''
-              className='pointer-events-none opacity-50'
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <div className='flex items-center py-4'>
+        <Input
+          placeholder='Filter order numbers...'
+          className='max-w-sm'
+          disabled
+        />
+      </div>
+      <div className='rounded-md border'>
+        <Table className='w-[725px]'>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                <Button
+                  variant='ghost'
+                  className='disabled:opacity-100'
+                  disabled
+                >
+                  Order Number
+                  <ArrowUpDownIcon className='ml-2 h-4 w-4' />
+                </Button>
+              </TableHead>
+              <TableHead>Consignment Number</TableHead>
+              <TableHead>
+                <Button
+                  variant='ghost'
+                  className='disabled:opacity-100'
+                  disabled
+                >
+                  Processed Date
+                  <ArrowUpDownIcon className='ml-2 h-4 w-4' />
+                </Button>
+              </TableHead>
+              <TableHead className='w-[83.2px]'></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+            <SkeletonRow />
+          </TableBody>
+        </Table>
+      </div>
+      <div className='flex items-center justify-between px-2 py-2'>
+        <div className='flex-1 text-sm'>
+          <div className='flex items-center space-x-2'>
+            <p className='text-sm font-medium'>Rows per page</p>
+            <Select disabled>
+              <SelectTrigger className='h-8 w-[70px]'>
+                <SelectValue placeholder='10' />
+              </SelectTrigger>
+            </Select>
+          </div>
+        </div>
+        <div className='flex items-center space-x-6 lg:space-x-8'>
+          <div className='flex w-[100px] items-center justify-center text-sm font-medium'>
+            <Skeleton className='h-4 w-[75px]' />
+          </div>
+          <div className='flex items-center space-x-2'>
+            <Button
+              variant='outline'
+              className='hidden h-8 w-8 p-0 lg:flex'
+              disabled
+            >
+              <span className='sr-only'>Go to first page</span>
+              <ChevronsLeftIcon className='h-4 w-4' />
+            </Button>
+            <Button variant='outline' className='h-8 w-8 p-0' disabled>
+              <span className='sr-only'>Go to previous page</span>
+              <ChevronLeftIcon className='h-4 w-4' />
+            </Button>
+            <Button variant='outline' className='h-8 w-8 p-0' disabled>
+              <span className='sr-only'>Go to next page</span>
+              <ChevronRightIcon className='h-4 w-4' />
+            </Button>
+            <Button
+              variant='outline'
+              className='hidden h-8 w-8 p-0 lg:flex'
+              disabled
+            >
+              <span className='sr-only'>Go to last page</span>
+              <ChevronsRightIcon className='h-4 w-4' />
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -86,17 +130,17 @@ const SkeletonRow = () => {
   return (
     <TableRow>
       <TableCell>
-        <Skeleton className='h-4 w-[75px]' />
+        <Skeleton className='h-4 w-[60px]' />
       </TableCell>
       <TableCell>
-        <Skeleton className='h-4 w-[125px]' />
+        <Skeleton className='h-4 w-[120px]' />
       </TableCell>
       <TableCell>
         <Skeleton className='h-4 w-[125px]' />
       </TableCell>
       <TableCell>
         <Button variant='ghost' size='icon' disabled>
-          <MoreVerticalIcon className='size-4' />
+          <MoreHorizontalIcon className='size-4' />
         </Button>
       </TableCell>
     </TableRow>
