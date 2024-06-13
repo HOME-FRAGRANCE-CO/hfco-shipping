@@ -8,7 +8,7 @@ import type {
 import { db } from '@/prisma/db';
 import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
-import { ProcessedOrder } from '@/types/order';
+import type { ProcessedOrder } from '@/types/order';
 
 const DF_apiBaseUrl = 'https://webservices.directfreight.com.au/Dispatch/api/';
 const DF_auth = process.env.DF_AUTHORISATION;
@@ -27,7 +27,10 @@ export const deleteConsignment = async (order: ProcessedOrder) => {
     throw new Error('Unauthorised');
   }
 
-  if (order.consignment_number !== 'UNKNOWN') {
+  if (
+    order.consignment_number !== 'UNKNOWN' &&
+    order.consignment_number !== ''
+  ) {
     const endpoint = 'CancelConsignment';
     const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
       method: 'POST',

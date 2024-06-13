@@ -93,7 +93,10 @@ export const Actions = ({ order }: Props) => {
 
         <DropdownMenuItem
           onClick={handleDownloadClick}
-          disabled={order.consignment_number === 'UNKNOWN'}
+          disabled={
+            order.consignment_number === 'UNKNOWN' ||
+            order.consignment_number === ''
+          }
         >
           <DownloadIcon className='mr-2 size-4' />
           Reprint
