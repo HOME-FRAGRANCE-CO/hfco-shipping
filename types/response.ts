@@ -61,6 +61,15 @@ export interface OrderNotesResponse {
   extensions: Extensions;
 }
 
+export interface FulfillmentOrderResponse {
+  data: {
+    fulfillmentOrder: {
+      orderName: string;
+    };
+  };
+  extensions: Extensions;
+}
+
 export interface CreateCompanyResponse {
   data: {
     companyCreate: {

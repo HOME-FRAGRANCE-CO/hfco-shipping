@@ -5,6 +5,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDownIcon } from 'lucide-react';
 import { Actions } from './Actions';
 import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
 
 export const columns: ColumnDef<ProcessedOrder>[] = [
   {
@@ -40,7 +41,45 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
     },
     cell: ({ row }) => {
       const date = row.original.processed_date;
-      const formatted = date?.toDateString();
+
+      if (!date) {
+        return (
+          <div className='font-medium italic text-muted-foreground'>
+            Unknown
+          </div>
+        );
+      }
+
+      const formatted = format(date, 'eee MMMM dd');
+
+      return <div className='font-medium'>{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: 'fulfillment_date',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant='ghost'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Fulfillment Date
+          <ArrowUpDownIcon className='ml-2 h-4 w-4' />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const date = row.original.fulfillment_date;
+
+      if (!date) {
+        return (
+          <div className='font-medium italic text-muted-foreground'>
+            Not fulfilled
+          </div>
+        );
+      }
+
+      const formatted = format(date, 'eee MMMM dd');
 
       return <div className='font-medium'>{formatted}</div>;
     },

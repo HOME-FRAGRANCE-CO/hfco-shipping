@@ -34,8 +34,9 @@ export type ProcessedOrder = {
   id: number;
   order_number: string;
   consignment_number: string;
-  consignment_id: number;
+  consignment_id: number | null;
   processed_date: Date | null;
+  fulfillment_date: Date | null;
   label_url: string | null;
 };
 

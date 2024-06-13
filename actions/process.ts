@@ -13,16 +13,11 @@ import { db } from '@/prisma/db';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@clerk/nextjs/server';
 
-import * as dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import tz from 'dayjs/plugin/timezone';
-import 'dayjs/locale/en-au';
 import { extractOrderNumber } from '@/utils';
 
-//* Australian Timezone for database
-dayjs.locale('en-au');
-dayjs.extend(utc);
-dayjs.extend(tz);
+import { toZonedTime } from 'date-fns-tz';
+
+const timezone = 'Australia/Sydney';
 
 const accessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
 const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
@@ -62,6 +57,15 @@ export const processOrder = async (
   const alreadyProcessed = await db.consignment.findFirst({
     where: {
       order_number: order.orderNumber,
+      consignment_id: {
+        not: null,
+      },
+      label_url: {
+        not: null,
+      },
+      consignment_number: {
+        not: '',
+      },
     },
   });
   if (alreadyProcessed) {
@@ -101,18 +105,22 @@ export const processOrder = async (
   }
 
   // Store consignment data in database
-  await db.consignment.create({
-    data: {
+  await db.consignment.upsert({
+    where: {
+      order_number: order.orderNumber,
+    },
+    update: {
+      consignment_id: consignmentID,
+      consignment_number: consignment.Connote,
+      label_url: consignmentAPIResponse.LabelURL,
+      fulfillment_date: toZonedTime(new Date(), timezone),
+    },
+    create: {
       order_number: order.orderNumber,
       consignment_id: consignmentID,
       consignment_number: consignment.Connote,
       label_url: consignmentAPIResponse.LabelURL,
-      processed_date: dayjs
-        .utc()
-        .tz('Australia/Sydney')
-        .format()
-        .substring(0, 19)
-        .concat('Z'),
+      fulfillment_date: toZonedTime(new Date(), timezone),
     },
   });
   revalidatePath('/processed');
@@ -215,7 +223,7 @@ async function getCustomerDetails(orderID: string) {
  * @param queryBody - The GraphQL query to be sent to the Shopify API
  * @returns The response from the Shopify API
  */
-const shopifyQueryAPI = async (queryBody: { query: string }) => {
+export const shopifyQueryAPI = async (queryBody: { query: string }) => {
   const response = await fetch(storeDomain!, {
     method: 'POST',
     headers: {
