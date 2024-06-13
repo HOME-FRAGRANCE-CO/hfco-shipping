@@ -19,16 +19,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useConfirm } from '@/hooks/use-confirm';
 
 type Props = {
   order: ProcessedOrder;
 };
 export const Actions = ({ order }: Props) => {
+  const [DeleteDialog, confirm] = useConfirm(
+    `Cancel Consignment ${order.order_number}`,
+    'Are you sure you want to cancel this consignment?',
+  );
   const [pending, startTransition] = useTransition();
   const { setConsignmentLink } = useOrders();
 
   const handleDeleteClick = async () => {
     if (pending) return;
+
+    const ok = await confirm();
+
+    if (!ok) return;
+
     startTransition(async () => {
       deleteConsignment(order)
         .then((data) => {
@@ -76,40 +86,43 @@ export const Actions = ({ order }: Props) => {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant='ghost' size='icon' disabled={pending}>
-          <span className='sr-only'>Open menu</span>
-          {pending ? (
-            <Loader className='size-4' />
-          ) : (
-            <MoreHorizontalIcon className='size-4' />
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='start'>
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+    <>
+      <DeleteDialog />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant='ghost' size='icon' disabled={pending}>
+            <span className='sr-only'>Open menu</span>
+            {pending ? (
+              <Loader className='size-4' />
+            ) : (
+              <MoreHorizontalIcon className='size-4' />
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='start'>
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={handleDownloadClick}
-          disabled={
-            order.consignment_number === 'UNKNOWN' ||
-            order.consignment_number === ''
-          }
-        >
-          <DownloadIcon className='mr-2 size-4' />
-          Reprint
-        </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={handleDownloadClick}
+            disabled={
+              order.consignment_number === 'UNKNOWN' ||
+              order.consignment_number === ''
+            }
+          >
+            <DownloadIcon className='mr-2 size-4' />
+            Reprint
+          </DropdownMenuItem>
 
-        <DropdownMenuItem
-          className='text-destructive focus:bg-destructive/10 focus:text-destructive'
-          onClick={handleDeleteClick}
-        >
-          <BanIcon className='mr-2 size-4' />
-          <span>Cancel</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuItem
+            className='text-destructive focus:bg-destructive/10 focus:text-destructive'
+            onClick={handleDeleteClick}
+          >
+            <BanIcon className='mr-2 size-4' />
+            <span>Cancel</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };
