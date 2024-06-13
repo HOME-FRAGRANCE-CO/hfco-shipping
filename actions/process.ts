@@ -57,19 +57,22 @@ export const processOrder = async (
   const alreadyProcessed = await db.consignment.findFirst({
     where: {
       order_number: order.orderNumber,
-      consignment_id: {
-        not: null,
-      },
       label_url: {
         not: null,
       },
       consignment_number: {
         not: '',
       },
+      fulfillment_date: {
+        not: null,
+      },
     },
   });
   if (alreadyProcessed) {
-    return { error: 'Order already processed' };
+    return {
+      error:
+        'Order already processed. If you need to reprocess the order, cancel it first.',
+    };
   }
 
   const customerDetails = await getCustomerDetails(orderID);
@@ -120,6 +123,7 @@ export const processOrder = async (
       consignment_id: consignmentID,
       consignment_number: consignment.Connote,
       label_url: consignmentAPIResponse.LabelURL,
+      processed_date: toZonedTime(new Date(), timezone),
       fulfillment_date: toZonedTime(new Date(), timezone),
     },
   });

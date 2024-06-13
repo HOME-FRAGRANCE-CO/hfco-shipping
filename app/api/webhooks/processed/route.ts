@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { toZonedTime } from 'date-fns-tz';
 import { shopifyQueryAPI } from '@/actions/process';
 import type { FulfillmentOrderResponse } from '@/types/response';
+import { createHmac } from 'crypto';
 
 const timezone = 'Australia/Sydney';
 
@@ -27,14 +28,11 @@ export async function POST(req: NextRequest) {
   const hmac = req.headers.get('X-Shopify-hmac-sha256');
   const textBody = await req.text();
 
-  const genHmac = await createHmac(
-    process.env.SHOPIFY_WEBHOOK_SECRET!,
-    textBody,
-  );
+  const genHmac = createHmac('sha256', process.env.SHOPIFY_WEBHOOK_SECRET!)
+    .update(textBody)
+    .digest('base64');
 
-  const hmacMatches = genHmac === hmac;
-
-  if (!hmacMatches) {
+  if (genHmac !== hmac) {
     return NextResponse.json(
       { message: 'HMAC verification failed' },
       { status: 401 },
@@ -63,6 +61,7 @@ export async function POST(req: NextRequest) {
     },
     update: {
       processed_date: toZonedTime(new Date(), timezone),
+      fulfillment_date: null,
     },
     create: {
       order_number: order_number,
@@ -72,28 +71,4 @@ export async function POST(req: NextRequest) {
   });
 
   return NextResponse.json({ message: 'Webhook processed successfully' });
-}
-
-async function createHmac(secret: string, message: string) {
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(secret);
-  const data = encoder.encode(message);
-
-  const key = await crypto.subtle.importKey(
-    'raw',
-    keyData,
-    {
-      name: 'HMAC',
-      hash: { name: 'SHA-256' },
-    },
-    false,
-    ['sign'],
-  );
-
-  const signature = await crypto.subtle.sign('HMAC', key, data);
-
-  const hashArray = Array.from(new Uint8Array(signature));
-  const hashBase64 = btoa(String.fromCharCode(...hashArray));
-
-  return hashBase64;
 }

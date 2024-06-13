@@ -6,7 +6,7 @@ import { useTransition } from 'react';
 import { useOrders } from '@/store/use-orders';
 import { deleteConsignment, reprintLabel } from '@/actions/history';
 
-import { DownloadIcon, MoreHorizontalIcon, TrashIcon } from 'lucide-react';
+import { BanIcon, DownloadIcon, MoreHorizontalIcon } from 'lucide-react';
 
 import { toast } from 'sonner';
 import { Loader } from '@/components/ui/loader';
@@ -30,7 +30,7 @@ export const Actions = ({ order }: Props) => {
   const handleDeleteClick = async () => {
     if (pending) return;
     startTransition(async () => {
-      deleteConsignment(order.consignment_number)
+      deleteConsignment(order)
         .then((data) => {
           if (data?.error) {
             toast.error(`Failed to cancel Order ${order.order_number}`, {
@@ -39,7 +39,7 @@ export const Actions = ({ order }: Props) => {
             return;
           }
           setConsignmentLink(order.order_number, null);
-          toast.success(`Order ${order.order_number} deleted successfully`);
+          toast.success(`Order ${order.order_number} cancelled successfully`);
         })
         .catch(() => {
           toast.error(`Failed to cancel Order ${order.order_number}`, {
@@ -91,7 +91,10 @@ export const Actions = ({ order }: Props) => {
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={handleDownloadClick}>
+        <DropdownMenuItem
+          onClick={handleDownloadClick}
+          disabled={order.consignment_number === 'UNKNOWN'}
+        >
           <DownloadIcon className='mr-2 size-4' />
           Reprint
         </DropdownMenuItem>
@@ -100,8 +103,8 @@ export const Actions = ({ order }: Props) => {
           className='text-destructive focus:bg-destructive/10 focus:text-destructive'
           onClick={handleDeleteClick}
         >
-          <TrashIcon className='mr-2 size-4' />
-          <span>Delete</span>
+          <BanIcon className='mr-2 size-4' />
+          <span>Cancel</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

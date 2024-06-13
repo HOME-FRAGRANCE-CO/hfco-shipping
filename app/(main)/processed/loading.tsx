@@ -34,16 +34,7 @@ export default function Loading() {
         <Table className='w-[825px]'>
           <TableHeader>
             <TableRow>
-              <TableHead>
-                <Button
-                  variant='ghost'
-                  className='disabled:opacity-100'
-                  disabled
-                >
-                  Order Number
-                  <ArrowUpDownIcon className='ml-2 h-4 w-4' />
-                </Button>
-              </TableHead>
+              <TableHead>Order Number</TableHead>
               <TableHead>Consignment Number</TableHead>
               <TableHead>
                 <Button

@@ -15,7 +15,7 @@ model consignment {
   order_number       String    @unique
   consignment_number String
   consignment_id     Int?      @unique
-  processed_date     DateTime? @default(now())
+  processed_date     DateTime
   fulfillment_date   DateTime?
   label_url          String?
 }

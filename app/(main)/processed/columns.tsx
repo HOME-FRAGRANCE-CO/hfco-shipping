@@ -10,17 +10,7 @@ import { format } from 'date-fns';
 export const columns: ColumnDef<ProcessedOrder>[] = [
   {
     accessorKey: 'order_number',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant='ghost'
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Order Number
-          <ArrowUpDownIcon className='ml-2 h-4 w-4' />
-        </Button>
-      );
-    },
+    header: 'Order Number',
   },
   {
     accessorKey: 'consignment_number',

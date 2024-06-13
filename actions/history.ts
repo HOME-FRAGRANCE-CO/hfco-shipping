@@ -8,6 +8,7 @@ import type {
 import { db } from '@/prisma/db';
 import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
+import { ProcessedOrder } from '@/types/order';
 
 const DF_apiBaseUrl = 'https://webservices.directfreight.com.au/Dispatch/api/';
 const DF_auth = process.env.DF_AUTHORISATION;
@@ -16,55 +17,58 @@ const DF_senderSiteId = process.env.DF_SENDER_SITE_ID;
 
 /**
  * Cancels a consignment
- * @param consignmentNumber - Consignment number to cancel
+ * @param order - Order to cancel consignment
  * @returns API response message
  */
-export const deleteConsignment = async (consignmentNumber: string) => {
+export const deleteConsignment = async (order: ProcessedOrder) => {
   const { userId } = auth();
 
   if (!userId) {
     throw new Error('Unauthorised');
   }
 
-  const endpoint = 'CancelConsignment';
-  const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorisation: DF_auth!,
-      AccountNumber: DF_accNum!,
-      SiteId: DF_senderSiteId!,
-    },
-    body: `{
-            "ConnoteList":[
-                {
-                    "Connote": ${consignmentNumber}
-                }
-            ]
-        }`,
-  });
+  if (order.consignment_number !== 'UNKNOWN') {
+    const endpoint = 'CancelConsignment';
+    const response = await fetch(`${DF_apiBaseUrl}${endpoint}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorisation: DF_auth!,
+        AccountNumber: DF_accNum!,
+        SiteId: DF_senderSiteId!,
+      },
+      body: `{
+              "ConnoteList":[
+                  {
+                      "Connote": ${order.consignment_number}
+                  }
+              ]
+          }`,
+    });
 
-  const data = (await response.json()) as CancelConsignmentResponse;
-  if (
-    !(
-      data.ResponseCode === '300' &&
-      (data.ConnoteList[0].ResponseCode === '200' ||
-        data.ConnoteList[0].ResponseCode === '421')
-    )
-  ) {
-    throw new Error('Failed to cancel consignment');
+    const data = (await response.json()) as CancelConsignmentResponse;
+    if (
+      !(
+        data.ResponseCode === '300' &&
+        (data.ConnoteList[0].ResponseCode === '200' ||
+          data.ConnoteList[0].ResponseCode === '421')
+      )
+    ) {
+      throw new Error('Failed to cancel consignment');
+    }
+
+    if (data.ConnoteList[0].ResponseCode === '421')
+      return {
+        error:
+          'Cannot cancel connote. We are unable to process your request, the consignment has been either pickup confirmed /collected, despatched or finalised.',
+      };
   }
 
-  if (data.ConnoteList[0].ResponseCode === '421')
-    return {
-      error:
-        'Cannot cancel connote. We are unable to process your request, the consignment has been either pickup confirmed /collected, despatched or finalised.',
-    };
-
-  await db.consignment.deleteMany({
+  await db.consignment.delete({
     where: {
-      consignment_number: consignmentNumber,
+      order_number: order.order_number,
+      consignment_number: order.consignment_number,
     },
   });
   revalidatePath('/processed');
