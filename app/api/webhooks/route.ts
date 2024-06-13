@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 import { toZonedTime } from 'date-fns-tz';
 import { shopifyQueryAPI } from '@/actions/process';
-import { FulfillmentOrderResponse } from '@/types/response';
+import type { FulfillmentOrderResponse } from '@/types/response';
 
 const timezone = 'Australia/Sydney';
 
@@ -34,16 +34,12 @@ export async function POST(req: NextRequest) {
 
   const hmacMatches = genHmac === hmac;
 
-  console.log('HMAC', hmacMatches);
-
   if (!hmacMatches) {
     return NextResponse.json(
       { message: 'HMAC verification failed' },
       { status: 401 },
     );
   }
-
-  console.log('Webhook data', textBody);
 
   const { id } = (JSON.parse(textBody) as WebhookData).fulfillment_order;
 
@@ -59,11 +55,7 @@ export async function POST(req: NextRequest) {
 
   const data = (await response.json()) as FulfillmentOrderResponse;
 
-  console.log(data);
-
   const order_number = data.data.fulfillmentOrder.orderName;
-
-  console.log('Order number', order_number);
 
   await db.consignment.upsert({
     where: {

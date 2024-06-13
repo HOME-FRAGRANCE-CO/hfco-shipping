@@ -44,7 +44,7 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
 
       if (!date) {
         return (
-          <div className='font-medium italic text-muted-foreground'>
+          <div className='text-center font-medium italic text-muted-foreground'>
             Unknown
           </div>
         );
@@ -52,7 +52,7 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
 
       const formatted = format(date, 'eee MMMM dd');
 
-      return <div className='font-medium'>{formatted}</div>;
+      return <div className='text-center font-medium'>{formatted}</div>;
     },
   },
   {
@@ -73,7 +73,7 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
 
       if (!date) {
         return (
-          <div className='font-medium italic text-muted-foreground'>
+          <div className='text-center font-medium italic text-muted-foreground'>
             Not fulfilled
           </div>
         );
@@ -81,7 +81,7 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
 
       const formatted = format(date, 'eee MMMM dd');
 
-      return <div className='font-medium'>{formatted}</div>;
+      return <div className='text-center font-medium'>{formatted}</div>;
     },
   },
   {

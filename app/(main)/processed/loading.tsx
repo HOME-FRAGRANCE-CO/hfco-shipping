@@ -31,7 +31,7 @@ export default function Loading() {
         />
       </div>
       <div className='rounded-md border'>
-        <Table className='w-[725px]'>
+        <Table className='w-[825px]'>
           <TableHeader>
             <TableRow>
               <TableHead>
@@ -55,7 +55,17 @@ export default function Loading() {
                   <ArrowUpDownIcon className='ml-2 h-4 w-4' />
                 </Button>
               </TableHead>
-              <TableHead className='w-[83.2px]'></TableHead>
+              <TableHead>
+                <Button
+                  variant='ghost'
+                  className='disabled:opacity-100'
+                  disabled
+                >
+                  Fulfillment Date
+                  <ArrowUpDownIcon className='ml-2 h-4 w-4' />
+                </Button>
+              </TableHead>
+              <TableHead></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -129,7 +139,10 @@ const SkeletonRow = () => {
         <Skeleton className='h-4 w-[120px]' />
       </TableCell>
       <TableCell>
-        <Skeleton className='h-4 w-[125px]' />
+        <Skeleton className='mx-auto h-4 w-[100px] ' />
+      </TableCell>
+      <TableCell>
+        <Skeleton className='mx-auto h-4 w-[100px]' />
       </TableCell>
       <TableCell>
         <Button variant='ghost' size='icon' disabled>
