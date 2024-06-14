@@ -5,7 +5,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDownIcon } from 'lucide-react';
 import { Actions } from './Actions';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
+import { formatUTCDate, formatUTCDateWithMinutes } from '@/lib/utils';
 
 export const columns: ColumnDef<ProcessedOrder>[] = [
   {
@@ -40,7 +40,7 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
         );
       }
 
-      const formatted = format(date, 'eee MMMM dd');
+      const formatted = formatUTCDateWithMinutes(date);
 
       return <div className='text-center font-medium'>{formatted}</div>;
     },
@@ -69,7 +69,7 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
         );
       }
 
-      const formatted = format(date, 'eee MMMM dd');
+      const formatted = formatUTCDate(date);
 
       return <div className='text-center font-medium'>{formatted}</div>;
     },
