@@ -19,7 +19,7 @@ export const Navbar = () => {
           },
         )}
       >
-        Labels
+        LABELS
         <span
           className={cn(
             'absolute bottom-0 left-0 h-1 w-full origin-left scale-x-0 transform bg-slate-400 transition-transform duration-150 ease-in-out group-hover:scale-x-100 group-hover:bg-slate-400',
@@ -40,7 +40,7 @@ export const Navbar = () => {
           },
         )}
       >
-        Processed
+        PROCESSED
         <span
           className={cn(
             'absolute bottom-0 left-0 h-1 w-full origin-left scale-x-0 transform bg-slate-400 transition-transform duration-150 ease-in-out group-hover:scale-x-100 group-hover:bg-slate-400',
