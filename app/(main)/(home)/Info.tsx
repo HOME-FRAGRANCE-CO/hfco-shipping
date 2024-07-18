@@ -12,7 +12,7 @@ const Info = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant='outline' className='flex gap-2 uppercase'>
+        <Button variant='outline' className='flex gap-2'>
           <NotepadTextIcon /> View Instructions
         </Button>
       </PopoverTrigger>
