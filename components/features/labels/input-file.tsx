@@ -1,25 +1,23 @@
 'use client';
 
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { useOrders } from '@/store/use-orders';
+import { readExcelFile } from '@/actions/excel';
+
+import { toast } from 'sonner';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
-} from '../../../components/ui/form';
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '../../../components/ui/button';
-import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 
-import { readExcelFile } from '@/actions/excel';
-
-import { useOrders } from '@/store/use-orders';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { UploadIcon } from 'lucide-react';
-
 const formSchema = z.object({
   file: z
     .union([z.instanceof(File), z.unknown()])
@@ -80,8 +78,7 @@ export function InputFile() {
           name='file'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>File</FormLabel>
-              <div className='flex gap-2'>
+              <div className='mt-4 flex gap-2'>
                 <FormControl>
                   <Input
                     placeholder='File'

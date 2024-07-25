@@ -1,10 +1,12 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { RotateCwIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+import { Button } from '@/components/ui/button';
+import { RotateCwIcon } from 'lucide-react';
 
 export const Refresh = () => {
   const [disabled, setDisabled] = useState(false);

@@ -1,5 +1,11 @@
 'use client';
 import type { OrderNotes, Order } from '@/types/order';
+
+import { useOrders } from '@/store/use-orders';
+import { useState, useTransition } from 'react';
+import { getOrderNotes, processOrder } from '@/actions/process';
+
+import { toast } from 'sonner';
 import {
   Table,
   TableBody,
@@ -9,12 +15,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { Loader } from '@/components/ui/loader';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
@@ -24,11 +29,6 @@ import Link from 'next/link';
 
 import { ArrowUpRightIcon, CircleHelpIcon, DownloadIcon } from 'lucide-react';
 
-import { useState, useTransition } from 'react';
-
-import { getOrderNotes, processOrder } from '@/actions/process';
-
-import { useOrders } from '@/store/use-orders';
 import {
   HoverCard,
   HoverCardContent,
@@ -43,6 +43,7 @@ type Props = {
 export const OrderList = ({ orders }: Props) => {
   const [pending, startTransition] = useTransition();
   const { setConsignmentLink, totalCartons, requiredPallets } = useOrders();
+
   const handleProcessAll = () => {
     if (pending) return;
     startTransition(() => {
@@ -263,7 +264,7 @@ const Order = ({ key, order }: OrderProps) => {
             </PopoverTrigger>
             <PopoverContent align='start' side='top' className='w-[425px]'>
               {!orderNotes ? (
-                <SkeletonCard />
+                <NotesSkeleton />
               ) : (
                 <div className='space-y-2'>
                   <div className='flex items-center justify-between '>
@@ -377,7 +378,7 @@ const Order = ({ key, order }: OrderProps) => {
   );
 };
 
-const SkeletonCard = () => {
+const NotesSkeleton = () => {
   return (
     <div className='space-y-2'>
       <div className='flex items-center justify-between '>

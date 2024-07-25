@@ -1,6 +1,7 @@
 import { getProcessedOrders } from '@/prisma/queries';
-import { DataTable } from './DataTable';
-import { columns } from './columns';
+
+import { DataTable } from '@/components/features/processed/data-table';
+import { columns } from '@/components/features/processed/columns';
 
 const ProcessedOrdersPage = async () => {
   const processedOrders = await getProcessedOrders();

@@ -2,6 +2,7 @@
 
 import type { ProcessedOrder } from '@/types/order';
 
+import { useConfirm } from '@/hooks/use-confirm';
 import { useTransition } from 'react';
 import { useOrders } from '@/store/use-orders';
 import { deleteConsignment, reprintLabel } from '@/actions/history';
@@ -19,7 +20,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useConfirm } from '@/hooks/use-confirm';
 
 type Props = {
   order: ProcessedOrder;

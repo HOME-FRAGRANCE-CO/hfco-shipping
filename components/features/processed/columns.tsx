@@ -1,11 +1,13 @@
 'use client';
-
 import type { ProcessedOrder } from '@/types/order';
-import type { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDownIcon } from 'lucide-react';
-import { Actions } from './Actions';
-import { Button } from '@/components/ui/button';
+
 import { formatUTCDate, formatUTCDateWithMinutes } from '@/lib/utils';
+
+import type { ColumnDef } from '@tanstack/react-table';
+import { Actions } from '@/components/features/processed/actions';
+import { Button } from '@/components/ui/button';
+
+import { ArrowUpDownIcon } from 'lucide-react';
 
 export const columns: ColumnDef<ProcessedOrder>[] = [
   {
@@ -15,6 +17,19 @@ export const columns: ColumnDef<ProcessedOrder>[] = [
   {
     accessorKey: 'consignment_number',
     header: 'Consignment Number',
+    cell: ({ row }) => {
+      const consignmentNumber = row.original.consignment_number;
+
+      return (
+        <div className='text-center font-medium'>
+          {consignmentNumber || (
+            <div className='text-center font-medium italic text-muted-foreground'>
+              Not processed yet
+            </div>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'processed_date',
