@@ -32,7 +32,7 @@ export default function RootLayout({
       <html lang='en'>
         <body className={inter.className}>
           {children}
-          <Toaster richColors position='top-center' theme='light' closeButton />
+          <Toaster richColors theme='light' closeButton />
         </body>
       </html>
     </ClerkProvider>
